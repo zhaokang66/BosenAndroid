@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="./css/mint/style.min.css">
+	
+</head>
+
+<style>
+	[v-cloak] {
+            display: none;
+    }
+	/*HTML5 元素超出部分滚动, 并隐藏滚动条*/
+	div::-webkit-scrollbar {
+        display: none;
+	}
+<!-- 	div::-webkit-scrollbar {
+		width:0px;
+		touch
+	} -->
+
+    table{
+        word-break:break-all;
+        word-wrap:break-word;
+        text-align: center;
+		
+    }
+
+    div.topDiv{
+
+        overflow:scroll;
+		-webkit-overflow-scrolling: touch;
+    }
+
+    div.downDiv{
+
+        overflow:scroll;
+		height:230px;
+		-webkit-overflow-scrolling: touch;		
+    }
+
+    table.topTable{
+        width:600px;
+        border-collapse:collapse;
+    }	
+	table.downTable{
+        width:600px;
+        border-collapse:collapse;
+	
+    }
+	table.topTable2{
+        width:1300px;
+        border-collapse:collapse;
+    }	
+	table.downTable2{
+        width: 1300px;
+        border-collapse:collapse;
+    }
+   
+	input.condition{
+		width:100px;
+		height:20px;
+	}
+	
+</style>
+
+<body>
+<div id="app" v-cloak>
+
+	<div>
+		<input type="text" placeholder="请输入采购订单号" class="condition"/>
+		<input type="text" placeholder="请输入供应商名称" class="condition"/>
+		<mt-button size="small" type="primary" @click.native="selectPP_ProductPO">查询</mt-button>
+	</div>
+	
+	<div style="border:1px solid black">
+		<!--主表-->
+		<div  @scroll="topScrollEvent" ref="topDiv" class="topDiv" >
+			<table class="topTable" border="1">
+				<thead>
+					<tr>	
+						<th style="width:100px">选择</th>	
+						<th style="width:100px">ID</th>	
+						<th style="width:100px">生产订单号</th>
+						<th style="width:100px">部门</th>
+						<th style="width:100px">单据日期</th	>
+						<th style="width:100px">备注</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		
+		<!--子表div-->
+		<div ref="downDiv" @scroll="downScrollEvent" class="downDiv" >
+
+			<table v-infinite-scroll="loadMore"
+				   infinite-scroll-disabled="loading"
+				   infinite-scroll-distance="50"
+				   class="downTable"
+				   border="1">
+				<tbody>
+					<tr v-for="pp_ProductPO in pp_ProductPOArray">
+						<td style="width:100px "  align="center" @click="checkboxClick"  class="inputTd"><input type="checkbox" v-model="pp_ProductPO.checked"  :id="pp_ProductPO.id"
+							:cDepName="pp_ProductPO.cDepName"/></td>
+						<td style="width:100px">{{pp_ProductPO.id}}</td>
+						<td style="width:100px">{{pp_ProductPO.cCode}}</td>
+						<td style="width:100px">{{pp_ProductPO.cDepName}}</td>
+						<td style="width:100px">{{pp_ProductPO.dDate}}</td>
+						<td style="width:100px">{{pp_ProductPO.cMemo}}</td>					
+					</tr>              
+				</tbody>
+				
+			</table>
+		</div>
+	</div>
+	<br>
+	<div style="border:1px solid black">
+	<!--采购订单子表主表-->
+		<div  @scroll="topScrollEvent2" ref="topDiv2" class="topDiv">
+			<table class="topTable2" border="1">
+				<thead>
+					<tr>
+						<th style="width:100px">选择</th>
+						<th style="width:100px">ID</th>
+						<th style="width:100px">MainId</th>
+						<th style="width:100px">生产计划号</th>
+						<th style="width:100px">存货编码</th>
+						<th style="width:100px">存货名称</th>
+						<th style="width:100px">存货代码</th>
+						<th style="width:100px">规格型号</th>
+						<th style="width:100px">开工日期</th>
+						<th style="width:100px">完工日期</th>
+						<th style="width:100px">单位</th>
+						<th style="width:100px">投产数量</th>
+						<th style="width:100px">累计入库数量</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		
+		<!--采购订单子表子表div-->
+		<div ref="downDiv2" @scroll="downScrollEvent2" class="downDiv">
+
+			<table class="downTable2" border="1">
+				<tbody>
+					<tr v-for="pp_Pomain in pp_PomainArray">
+						<td style="width:100px;text-align:center" ><input type="checkbox" v-model="pp_Pomain.checked" style="zoom:150%;"/></td>
+						<td style="width:100px">{{pp_Pomain.id}}</td>
+						<td style="width:100px">{{pp_Pomain.mainId}}</td>
+						<td style="width:100px">{{pp_Pomain.productionCode}}</td>
+						<td style="width:100px">{{pp_Pomain.inventory.cInvCode}}</td>
+						<td style="width:100px">{{pp_Pomain.inventory.cInvName}}</td>
+						<td style="width:100px">{{pp_Pomain.inventory.cInvAddCode}}</td>
+						<td style="width:100px">{{pp_Pomain.inventory.cInvStd}}</td>
+						<td style="width:100px">{{pp_Pomain.dStartDate}}</td>
+						<td style="width:100px">{{pp_Pomain.dEndDate}}</td>
+						<td style="width:100px">{{pp_Pomain.inventory.computationUnit.cComunitName}}</td>	
+						<td style="width:100px">{{pp_Pomain.fQuantity}}</td>
+						<td style="width:100px">{{pp_Pomain.fInQuantity}}</td>
+
+					</tr>              
+				</tbody>
+			</table>
+		</div>
+	</div>	
+	<mt-button size="small" type="primary" @click="jumpOderInstock" style="float:right" :disabled="isDisable">确定</mt-button>
+	<mt-button size="small" type="primary" style="float:right">取消</mt-button>
+</div>
+
+
+</body>
+
+
+<!-- 先引入 Vue -->
+<script src="./js/vue/vue2.6.10.js"></script>
+<script src="./js/jquery/jquery3.4.1.js" ></script>
+<!-- 引入组件库 -->
+<script src="./js/mint/index.js"></script>
+<!--引入axios-->
+<script src="./js/vue/axios.min.js"></script>	
+<script src="./js/setting.js"></script>
+
+<script>
+//设置axios的默认超时时间
+axios.defaults.timeout = 10000;		 
+    var vue=new Vue({
+        el:"#app",
+        data:{
+            pp_ProductPOArray:[],
+            pp_PomainArray:[],	
+            pp_PodetailsArray: [],
+			minEndId:-1,
+			isDisable: true,
+			cDepName: []
+        },
+        methods:{
+			selectPP_ProductPO:function(){
+				var url = getUrl()+"listPP_ProductPO?bFinished=true&endId=-1&detailsFinshed=false"
+				this.pp_ProductPOArray=[]
+				this.pp_PomainArray=[]
+				this.doLoadMore(url)
+			},
+            //加载更多
+            loadMore:function(){
+				this.loading = true;
+				if(this.minEndId!=-1){
+					//alert(this.minEndId);
+					var url = getUrl()+"listPP_ProductPO?bFinished=true&detailsFinshed=false&endId="+this.minEndId;
+					this.doLoadMore(url)
+					
+				}
+                this.loading = false;
+            },      
+			
+			
+		    topScrollEvent:function(e){
+			    this.$refs.downDiv.scrollLeft=this.$refs.topDiv.scrollLeft;
+
+		    },
+		    downScrollEvent:function(e){
+		    	this.$refs.topDiv.scrollLeft=this.$refs.downDiv.scrollLeft;
+			   
+		    },
+			topScrollEvent2:function(e){
+
+			    this.$refs.downDiv2.scrollLeft=this.$refs.topDiv2.scrollLeft;
+
+		    },
+		    downScrollEvent2:function(e){
+		    	this.$refs.topDiv2.scrollLeft=this.$refs.downDiv2.scrollLeft;	  
+		    },
+		    doLoadMore:function(url){
+
+				axios.get(url).then(function(response) {
+					// vue.$refs.topDiv.scrollLeft=0;
+					var jsonObject = response.data;
+					if (jsonObject.length == 0) {
+						return;
+					}
+					for(each in jsonObject){
+						jsonObject[each].checked="";
+					}
+					console.log(jsonObject)
+					vue.minEndId=jsonObject[jsonObject.length-1].id;
+					// alert(response.data)
+					vue.pp_ProductPOArray=vue.pp_ProductPOArray.concat(jsonObject);					
+				}).catch(function (e) {
+					vue.$messagebox.alert(e, '错误');
+				});
+		    },
+			checkboxClick:function(e){
+					
+				var target=e.target;
+				if(e.target.getAttribute("class")=="inputTd"){
+					var target=e.target.firstChild
+					if(target.checked){
+						target.checked=""
+					}
+					else
+						target.checked="checked"
+				}
+				var ID=target.getAttribute("id");
+				if(target.checked){
+					if (this.cDepName.length == 0) {
+						this.cDepName.push(target.getAttribute("cDepName"));
+					}else {
+						if (this.cDepName.indexOf(target.getAttribute("cDepName")) == -1) {
+							vue.$messagebox.alert("请选择相同部门的生产订单!", '错误');
+							target.checked="";
+							return;
+						}else {
+							this.cDepName.push(target.getAttribute("cDepName"));
+						}
+					}
+					var url=getUrl()+"listPP_Pomain?ID="+ID+"&bFinished=true&detailsFinshed=false";
+					axios.get(url).then(function(response) {
+						vue.$refs.topDiv2.scrollLeft=0;			        
+						var jsonObject = response.data;						
+						for(each in jsonObject){
+							jsonObject[each].checked="true";
+							vue.selectPP_Podetails(jsonObject[each].mainId);
+						}
+						vue.pp_PomainArray=vue.pp_PomainArray.concat(jsonObject);
+					// vue.pp_PomainSelection=vue.pp_PomainSelection.concat(jsonObject);
+					}).catch(function (e) {
+						vue.$messagebox.alert(e, '错误');
+					});
+				}else{
+					if (this.cDepName.length != 0) {
+						this.cDepName.splice(this.cDepName.length-1,1);
+					}
+
+					for(var i=0;i<this.pp_PomainArray.length;i++){
+						if(this.pp_PomainArray[i].id==ID){
+							this.pp_PomainArray.splice(i,1);
+							i--;
+						}
+					}
+				}
+			},
+			jumpOderInstock:function(){
+				window.localStorage.clear();
+				var that = this;
+		    	this.isDisable = true;
+		    	var submitData = this.pp_PodetailsArray.slice();
+		    	setTimeout(function() {
+		    		that.isDisable = false;
+		    	},1000);
+				for (i in this.pp_PomainArray) {
+					if (!this.pp_PomainArray[i].checked) {
+						for (var j = 0; j < submitData.length; j++) {
+							if (submitData[j].mainId == this.pp_PomainArray[i].mainId) {
+								submitData.splice(j,1);
+								j--;
+							}
+						}
+					}
+				}
+
+				console.log(submitData)
+				if (submitData.length == 0) {
+					vue.$messagebox.alert("请选择所属子项！", '错误');
+					return;
+				}
+
+				if (typeof(Storage) !== "undefined") {
+					localStorage.setItem("pp_PodetailsArray",JSON.stringify(submitData));
+					makeJava.jumpHtml("file:///android_asset/ppInStockByOder.html");				
+				} else {
+    				alert("Sorry, your browser does not support Web Storage...")
+				}
+			
+			},
+			selectPP_Podetails: function(mainId) {	
+				var url = getUrl()+"listPP_Podetails?mainId="+mainId+"&detailsFinshed=false";	
+				axios.get(url).then(function(response){
+					var jsonObject = response.data;
+						for(each in jsonObject) {
+							jsonObject[each].checked = "true";
+						}
+					vue.pp_PodetailsArray = vue.pp_PodetailsArray.concat(jsonObject);
+
+				}).catch(function (e) {
+					vue.$messagebox.alert(e, '错误');
+				});	
+			}
+        },
+        watch: {
+        	pp_PomainArray : function(val) {
+        		if (val != []) {
+        			this.isDisable = false;
+        		}else {
+        			this.isDisable = true;
+        		}
+        	}
+        },
+		
+
+    })
+
+
+</script>

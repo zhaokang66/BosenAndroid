@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<!-- 引入样式 -->
+	<link rel="stylesheet" type="text/css" href="./css/mint/style.min.css">
+	<link rel="stylesheet" href="./css/bootstrap/3.3.7/bootstrap.min.css">
+	<script src="./js/jquery/2.1.1/jquery.min.js"></script>
+	<script src="./js/bootstrap/3.3.7/bootstrap.min.js"></script>
+	
+</head>
+<style>
+[v-cloak] {
+	display: none;
+}
+/*HTML5 元素超出部分滚动, 并隐藏滚动条*/
+div::-webkit-scrollbar {
+	display: none;
+}
+#app{
+	min-width: 900px;
+	position: relative;
+}
+table{
+	word-break:break-all;
+	word-wrap:break-word;
+	border-collapse:collapse;
+
+}
+div.topDiv{
+
+	overflow:scroll;
+	-webkit-overflow-scrolling: touch;
+}
+div.downDiv{
+	overflow:scroll;
+	height: 520px;
+	-webkit-overflow-scrolling: touch;		
+}
+.red{
+	background-color: #F92626;
+}
+td{
+	text-align: center;
+}
+.inventoryBox{
+	width: 100%;
+	height: 1044px;
+
+}
+.inventoryMenu{
+	width: 24%;			
+	float: left;
+}
+.inventoryList{
+	width: 74%;
+	height: 520px;
+	float: left;
+}
+.eachInventoy{
+	cursor: pointer;
+}
+.inventoryInput{
+	position: relative;
+}
+.search{
+	display: block;
+	cursor: pointer;
+	position: absolute;
+	top: -4px;
+}
+</style>	
+<div id="app" v-cloak>
+	<mt-button size="small " type="primary" @click.native="selectPO_Pomain" style="visibility:hidden">查询</mt-button>
+	<div style="border:1px solid black">
+		<select v-model="chooseWharehouse">
+			<option value="">选择仓库</option>
+			<option :value="list.cWhCode" v-for="list in listWharehouse">{{list.cWhCode}} {{list.cWhName}}</option>
+		</select>
+		<select v-model="chooseCRdCode">
+			<option value="">选择出库类别</option>
+			<option :value="list.cRdCode" v-for="list in listRdStyle">{{list.cRdCode}} {{list.cRdName}}</option>
+		</select>
+		<select v-model="choosecDepCode">
+			<option value="">选择部门</option>
+			<option :value="list.cDepCode" v-for="list in listdepartmen">{{list.cDepCode}} {{list.cDepName}}</option>
+		</select>
+		<label>备注：</label>
+		<input type="text" name="cMemo" v-model="cMemo">
+		<!--采购订单子表主表-->
+		<div  @scroll="topScrollEvent2" ref="topDiv2" class="topDiv">
+			<table class="topTable2" border="1">
+				<thead>
+					<tr>
+						<th style="width:100px">序号</th>
+						<th style="width:100px">生产计划号</th>
+						<th style="width:100px">存货编码</th>
+						<th style="width:100px">存货名称</th>
+						<th style="width:100px">规格型号</th>
+						<th style="width:100px">单位</th>
+						<th style="width:100px">数量</th>
+						<th style="width:100px">单价</th>
+						<th style="width:100px">金额</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		
+		<!--采购订单子表子表div-->
+		<div ref="downDiv2" @scroll="downScrollEvent2" class="downDiv">
+
+			<table class="downTable2" border="1">
+				<tbody  id="list_info">
+					<tr v-for="(v,index) in otherInRdrecord" id="">
+						<td style="width:100px">{{index + 1}}</td>
+						<td style="width:100px">
+							<input type="text" style="width: 98%;" :value="v.cDefine22" v-model="v.cDefine22" @change="cInvCodeIsExists(index)">
+						</td>
+						<td style="width:100px" class="inventoryInput form-group" @click="setFlag(index)">
+							
+							<span class="glyphicon glyphicon-search form-control-feedback search" style="display: inline-block;">
+							</span>
+							<a data-toggle="modal"  @click="setCInvCCode('0101')">
+								<div style="width: 25px;height: 100%;position: absolute;right: 0;z-index: 100;cursor: pointer;top: 0;right: 0;"> </div>
+							</a>
+							<input type="text" style="width: 98%;padding-right: 20px;" :value="v.cInvCode" @change="checkCInvCode(index)" v-model="v.cInvCode">
+
+						</td>
+
+						<td style="width:100px">{{v.cInvName}}</td>
+						<td style="width:100px">{{v.cInvStd}}</td>
+						<td style="width:100px">{{v.cComunitName}}</td>
+						<td style="width:100px">
+							<input type="number"  style="width: 98%;" :value="v.fQuantity"  v-model.number="v.fQuantity" @change="sumPrice(index)">
+						</td>
+						<td style="width:100px">
+							<input type="number"  style="width: 98%;" :value="v.iUnitCost" v-model.number="v.iUnitCost" @change="sumPrice(index)">
+						</td>	
+						<td style="width:100px">{{v.iPrice}}</td>				
+					</tr>              
+				</tbody>	
+			</table>
+			<mt-button size="small " type="primary" @click.native="submitotherInRrecord" :disabled="isDisable">提交</mt-button>
+		</div>
+	</div>
+
+
+	<div class="modal fade" id="inventoryInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+						&times;
+					</button>
+				</div>
+
+				<!-- 这里是内容 -->
+				<div class="inventoryBox">
+
+
+					<div class="inventoryMenu">
+						<ul class="nav nav-pills nav-stacked">
+
+							<li role="presentation" id="menu">
+								<a href="#parent" class="nav-header collapsed" data-toggle="collapse" id="collapseParent" onclick="chevron_toggle()">分类<span class="pull-right glyphicon glyphicon-chevron-down"></span></a>
+								<ul id="parent" class="nav nav-list collapse secondaryTitle" >
+
+									<li>
+										<a href="#listone" class="nav-header collapsed" data-toggle="collapse" id="collapseParent" onclick="chevron_toggle()">01原材料<span class="pull-right glyphicon glyphicon-chevron-down"></span></a>
+										<ul id="listone" class="nav nav-list collapse">
+											<li><a href="#" @click="setCInvCCode('0101')">0101冲压材料</a></li>
+											<li><a href="#" @click="setCInvCCode('0102')">0102弹簧材料</a></li>
+											<li><a href="#" @click="setCInvCCode('0103')">0103油管材料</a></li>
+											<li><a href="#" @click="setCInvCCode('0104')">0104机加工材料</a></li>
+											<li><a href="#" @click="setCInvCCode('0105')">0105橡胶材料</a></li>
+										</ul>
+									</li>
+
+									<li>
+										<a href="#listtwo" class="nav-header collapsed" data-toggle="collapse" id="collapseParent" onclick="chevron_toggle()">02半成品<span class="pull-right glyphicon glyphicon-chevron-down"></span></a>
+										<ul id="listtwo" class="nav nav-list collapse">
+											<li><a href="#" @click="setCInvCCode('0201')">0201冲压件</a></li>
+											<li><a href="#"  @click="setCInvCCode('0202')">0202弹簧件</a></li>
+											<li><a href="#"  @click="setCInvCCode('0203')">0203油管</a></li>
+											<li><a href="#"  @click="setCInvCCode('0204')">0204机加工</a></li>
+											<li><a href="#"  @click="setCInvCCode('0205')">0205橡胶件</a></li>
+											<li><a href="#"  @click="setCInvCCode('0206')">0206橡胶件</a></li>
+										</ul>
+									</li>
+
+									<li>
+										<a href="#listthree" class="nav-header collapsed" data-toggle="collapse" id="collapseParent" onclick="chevron_toggle()">03产成品<span class="pull-right glyphicon glyphicon-chevron-down"></span></a>
+										<ul id="listthree" class="nav nav-list collapse">
+											<li><a href="#" @click="setCInvCCode('0301')">0301冲压件</a></li>
+											<li><a href="#" @click="setCInvCCode('0302')">0302弹簧件</a></li>
+											<li><a href="#" @click="setCInvCCode('0303')">0303油管</a></li>
+											<li><a href="#" @click="setCInvCCode('0304')">0304机加工</a></li>
+											<li><a href="#" @click="setCInvCCode('0305')">0305橡胶产品</a></li>
+											<li><a href="#" @click="setCInvCCode('0306')">0306维修包</a></li>
+											<li><a href="#" @click="setCInvCCode('0307')">0307报警线</a></li>
+											<li><a href="#" @click="setCInvCCode('0310')">0310其他</a></li>
+										</ul>
+									</li>
+
+									<li>
+										<a href="#" >04低值易耗品</a>
+									</li>
+									<li>
+										<a href="#" >05五金类</a>
+									</li>
+									<li>
+										<a href="#">06费用类</a>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+
+					<div class="inventoryList">
+						<div style="overflow: scroll;text-align: center; "  @scroll="topScrollEvent3" ref="inventoryTopDiv" id="inventoryTopDiv">
+							<table  border="1" style="border-collapse:collapse">
+								<thead>
+									<tr >
+										<th style="width: 100px;">存货编码</th>
+										<th style="width: 100px;">存货代码</th>
+										<th style="width: 100px;">存货名称</th>
+										<th style="width: 100px;">规格型号</th>
+										<th style="width: 100px;">计量单位</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+						<div style="overflow: scroll;height: 977px;"  @scroll="downScrollEvent3" ref="inventoryDownDiv" id="inventoryDownDiv">
+							<table border="1"
+							v-infinite-scroll="loadMore"
+				  	 			infinite-scroll-disabled="loading"
+				   				infinite-scroll-distance="50"
+							>
+								<tbody>
+
+									<tr v-for="inventory in inventoryArray" class="eachInventoy" id="eachInventoy" @mouseenter="inventoryMouseOver" @mouseleave="inventoryMouseOut" @click="addData">
+										<th style="width: 100px;" :cInvCode="inventory.cInvCode" :cVenCode="inventory.cVenCode">{{inventory.cInvCode}}</th>
+										<th style="width: 100px;">{{inventory.cInvAddCode}}</th>
+										<th style="width: 100px;" :cInvName="inventory.cInvName">{{inventory.cInvName}}</th>
+										<th style="width: 100px;" :cInvStd="inventory.cInvStd">{{inventory.cInvStd}}</th>
+										<th style="width: 100px;" :cComunitName="inventory.computationUnit.cComunitName">{{inventory.computationUnit.cComunitName}}</th>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+	
+</div>
+
+<!-- 先引入 Vue -->
+<!-- <script src="./js/jquery/jquery3.4.1.js" ></script> -->
+<script src="./js/vue/vue2.6.10.js"></script>
+<!-- 引入组件库 -->
+<script src="./js/mint/index.js"></script>
+<!--引入axios-->
+<script src="./js/vue/axios.min.js"></script>
+<script src="./js/setting.js"></script>
+<script>
+
+	function chevron_toggle(){
+		$("#collapseParent").find("span").toggleClass("glyphicon-chevron-up");
+		$("#collapseParent").find("span").toggleClass("glyphicon-chevron-down");
+	}
+	var vue = new Vue({
+		el: "#app",
+		data: {
+			otherInRdrecord: [],
+			chooseWharehouse: '',
+			listWharehouse: [],
+			isDisable: false,
+			cMemo: '',
+			listRdStyle: [],
+			listdepartmen: [],
+			chooseCRdCode: '',
+			inventoryArray: [],
+			listNumber: 10,
+			addNumber: 1,
+			choosecDepCode: '',
+			maxLine: 0,
+			cInvCCode: '',
+			limit: 0
+		},
+		methods: {
+			topScrollEvent:function(e){
+
+				this.$refs.downDiv.scrollLeft=this.$refs.topDiv.scrollLeft;
+
+			},
+			downScrollEvent:function(e){
+				this.$refs.topDiv.scrollLeft=this.$refs.downDiv.scrollLeft;
+
+			},
+			topScrollEvent2:function(e){
+
+				this.$refs.downDiv2.scrollLeft=this.$refs.topDiv2.scrollLeft;
+
+			},
+			downScrollEvent2:function(e){
+				this.$refs.topDiv2.scrollLeft=this.$refs.downDiv2.scrollLeft;
+
+			},
+			topScrollEvent3: function(e){
+				this.$refs.inventoryTopDiv.scrollLeft=this.$refs.inventoryDownDiv.scrollLeft;
+			},
+			downScrollEvent3: function(e){
+				this.$refs.inventoryDownDiv.scrollLeft=this.$refs.inventoryTopDiv.scrollLeft;
+			},
+			inventoryMouseOver: function(e) {
+				// console.log(e.target)
+				var target = e.target;
+				target.style.backgroundColor = "grey";
+
+			},
+			inventoryMouseOut: function(e) {
+				var target = e.target;
+				target.style.backgroundColor = "white";
+			},
+			addData: function(e) {
+				var target = e.currentTarget.children;
+				
+				var cInvCode = target[0].getAttribute("cInvCode");
+				var cVenCode = target[0].getAttribute("cVenCode");
+				var cInvName = target[2].getAttribute("cInvName");
+				var cInvStd = target[3].getAttribute("cInvStd");
+				var cComunitName = target[4].getAttribute("cComunitName");
+				//addNnubmber =maxIdex maxIndex +10
+				vue.otherInRdrecord[vue.addNumber].cInvCode = cInvCode;
+				vue.otherInRdrecord[vue.addNumber].cVenCode = cVenCode;
+				vue.otherInRdrecord[vue.addNumber].cInvName = cInvName;
+				vue.otherInRdrecord[vue.addNumber].cInvStd = cInvStd;
+				vue.otherInRdrecord[vue.addNumber].cComunitName = cComunitName;
+				if (vue.addNumber == vue.maxLine - 1) {
+					vue.maxLine += 10;
+				}
+				console.log(vue.otherInRdrecord)
+
+				$('#inventoryInfo').modal('hide');
+			},
+			setFlag: function(index) {
+				console.log(vue.otherInRdrecord)
+				vue.addNumber = index;
+			},
+			checkCInvCode: function(index) {
+				//if index = maxIndex maxindex +10 
+				
+				if (this.chooseWharehouse == '') {
+					vue.otherInRdrecord[index].cInvCode = "";
+					vue.$messagebox.alert("请先选择仓库！","错误");
+					return;
+				}
+
+				var res = true;
+				var cInvCode =vue.otherInRdrecord[index].cInvCode;
+				console.log(cInvCode)
+				//这里检验cInvCode 是否合法如果合法，则返回相应的其他字段信息，并且赋值给vue.otherInRdrecord[index]
+				var url = getUrl() + "selectInventory?cInvCode=" + cInvCode;
+				axios.get(url).then(function(response){
+					var jsonObject = response.data;
+					console.log(jsonObject)
+					if (jsonObject.length == 0) {
+						vue.otherInRdrecord[index].cInvCode = "";
+						vue.otherInRdrecord[index].cInvStd = "";
+						vue.otherInRdrecord[index].cInvName = "";
+						vue.otherInRdrecord[index].cComunitName = "";
+						res = false;
+						vue.$messagebox.alert("没有这个存货编码，请重新输入！","错误");
+						return;
+					} else {
+						vue.otherInRdrecord[index].cInvStd = jsonObject.cInvStd;
+						vue.otherInRdrecord[index].cInvName = jsonObject.cInvName;
+						vue.otherInRdrecord[index].cComunitName = jsonObject.computationUnit.cComunitName;
+						vue.otherInRdrecord[index].cVenCode = jsonObject.cVenCode;
+						if (index == vue.maxLine - 1) {
+							vue.maxLine += 10;
+						}
+					}
+				})
+				.catch(function(e){
+					vue.$messagebox.alert(e, "错误");
+				});
+				return res;
+			},
+		    //扫码器调用的方法
+		    addiReceivedQTY: function(val) {
+		    	if (this.chooseWharehouse == '') {
+		    		vue.$messagebox.alert("请先选择仓库！","错误");
+		    		return;
+		    	}
+		    	var temp = [];
+		    	var emptyStart = -1;
+		    	for (var i = 0; i < this.otherInRdrecord.length; i++) {
+		    		if (this.otherInRdrecord[i].cInvCode == val) {
+		    			temp.push(i + 1);
+		    		}
+		    		if (emptyStart == -1 && this.otherInRdrecord[i].cInvCode == "") {
+		    			emptyStart = i;
+		    		}
+		    	}
+		    	if (temp.length == 0) {
+		    		//emptyStart maxIndex ? maxIndex +10
+		    		if (emptyStart == vue.maxLine - 1) {
+		    			vue.maxLine += 10;
+		    		}
+		    		vue.otherInRdrecord[emptyStart].cInvCode = val;
+		    		vue.otherInRdrecord[emptyStart].fQuantity = (this.checkCInvCode(emptyStart)) ? vue.otherInRdrecord[emptyStart].fQuantity + 1 : vue.otherInRdrecord[emptyStart].fQuantity;
+		    	} else if (temp.length == 1) {
+		    		vue.otherInRdrecord[temp[0] - 1].fQuantity++;
+		    	} else {
+		    		vue.$messagebox.alert("记录中有至少两条相同的存货编码，请在第"+temp.join(", ")+"行手动输入入库数量！");
+		    	}
+		    },
+		     loadMore: function () {
+
+		    	this.loading = true;
+		    	vue.limit += 50;
+		    	if (vue.limit != 50) {
+		    		vue.selectInventory();
+		    	}
+		    	this.loading = false;
+		    },
+		    setCInvCCode: function (cInvCCode) {
+		    	if (this.chooseWharehouse == '') {
+		    		vue.$messagebox.alert("请先选择仓库！","错误");
+		    		return;
+		    	}
+		    	vue.cInvCCode = cInvCCode;
+		    	$('#inventoryInfo').modal('show');
+		    	vue.inventoryArray = [];
+		    	vue.selectInventory();
+		    },
+		    selectInventory: function() {		    	
+		    	var url = getUrl() + "listInventory?cInvCCode="+vue.cInvCCode+"&limit="+vue.limit;
+		    	axios.get(url).then(function(response){
+		    		var jsonObject = response.data;
+		    		if (jsonObject.length == 0) return;
+		    		vue.inventoryArray = vue.inventoryArray.concat(jsonObject);
+		    	})
+		    	.catch(function(e){
+		    		vue.$messagebox.alert(e, '错误');
+		    	});		    	
+		    },
+		    submitotherInRrecord: function() {
+		    	var that = this;
+		    	var submitData = this.otherInRdrecord.slice();
+		    	this.isDisable = true;
+		    	setTimeout(function(){
+		    		that.isDisable = false;
+		    	},1000);
+		    	submitData = this.checkData(submitData);
+		    	if(!submitData) return;
+		    	if (submitData.length == 0) {
+		    		vue.$messagebox.alert("表体没有数据，请输入！", "错误");
+		    		return;
+		    	};
+		    	var url = getUrl()+"submitotherOutRrecord";
+		    	axios.post(url,submitData)
+		    	.then(function(response){
+		    		vue.$messagebox.alert(response.data);
+		    	})
+		    	.catch(function(e){
+		    		vue.$messagebox.alert(e, '错误');
+		    	});
+		    },
+		    //计算金额
+		    sumPrice: function(index) {
+		    	if (!this.cInvCodeIsExists(index)) return;
+		    	var a = this.otherInRdrecord[index].fQuantity;
+		    	var b = this.otherInRdrecord[index].iUnitCost;
+		    	a = a * 1;
+		    	this.otherInRdrecord[index].iPrice = a * b;
+		    },
+		    cInvCodeIsExists: function(index) {
+		    	if (this.otherInRdrecord[index].cInvCode == "") {
+		    		vue.otherInRdrecord[index].cDefine22 = "";
+		    		vue.otherInRdrecord[index].iUnitCost = 0;
+		    		vue.otherInRdrecord[index].fQuantity = 0;
+		    		vue.$messagebox.alert("请先输入存货编码！", '错误');
+		    		return false;
+		    	}
+		    	return true;
+		    },
+		    //检查数据
+		    checkData: function(data) {
+		    	if (this.chooseWharehouse == "") {
+		    		vue.$messagebox.alert("表体没有数据，请输入！", '错误');
+		    		return false;
+		    	}
+		    	for (var i = 0; i < data.length; i++) {
+		    		if (data[i].cInvCode == "") {
+		    			data.splice(i,1);
+		    			i--;
+		    		}else {
+		    			if (data[i].fQuantity >= 0) {
+		    				vue.$messagebox.alert("第"+(i+1)+"条数据入库数量不能大于等于0！", '错误');
+		    				return;
+		    			}else {
+		    				data[i].cWhCode = vue.chooseWharehouse;
+		    				data[i].cRdCode = vue.chooseCRdCode;
+		    				data[i].cDepCode = vue.choosecDepCode;
+		    				data[i].cMemo = vue.cMemo;
+		    			}
+		    		}
+		    	}
+		    	console.log(data);
+		    	return data;
+		    }
+		},
+		watch: {
+			chooseWharehouse: function(val) {
+				this.chooseWharehouse = val;
+			},
+			maxLine: function(newVal, oldVal) {
+				for(var i = 0; i < newVal - oldVal; i++){
+					vue.otherInRdrecord.push({"cDefine22":"","cInvCode":"","cInvName":"","cInvStd":"","cComunitName":"","fQuantity":0,"iUnitCost":0,"iPrice":0,"cWhCode": "","cRdCode":"","cDepCode":"","cMemo":"","cVenCode":""});
+				}
+			}
+		},
+		//获取仓库信息
+		created: function() {
+			axios.get(getUrl()+"getcWhCodeList")
+			.then(function(response){
+				var cWhCodeList = response.data;
+				for (var i in cWhCodeList) {
+	   				// console.log(vue.listWharehouse)
+	   				vue.listWharehouse.push(cWhCodeList[i]);
+	   			}
+	   		})
+			.catch(function(e){
+				vue.$messagebox.alert(e, '错误');
+			});
+			axios.get(getUrl()+"getRdStyleList?bRdFlag=0")
+			.then(function(response){
+				var cRdStyleList = response.data;
+				for (var i in cRdStyleList) {
+	   				// console.log(vue.listWharehouse)
+	   				vue.listRdStyle.push(cRdStyleList[i]);
+	   			}
+	   		})
+			.catch(function(e){
+				vue.$messagebox.alert(e, '错误');
+			});
+
+			axios.get(getUrl()+"getDepartmentList")
+			.then(function(response){
+				var departmentList = response.data;
+				for (var i in departmentList) {
+	   				// console.log(vue.listWharehouse)
+	   				vue.listdepartmen.push(departmentList[i]);
+	   			}
+	   		})
+			.catch(function(e){
+				vue.$messagebox.alert(e, '错误');
+			});
+		},
+		mounted: function() {
+			this.maxLine += 10;
+
+		}
+	})
+</script>	

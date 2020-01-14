@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="./css/mint/style.min.css">
+	
+</head>
+<style>
+	[v-cloak] {
+            display: none;
+    }
+	/*HTML5 元素超出部分滚动, 并隐藏滚动条*/
+	div::-webkit-scrollbar {
+        display: none;
+	}
+	#app{
+		min-width: 1446px;
+	}
+	table{
+        word-break:break-all;
+        word-wrap:break-word;
+		/*width:1250px;*/
+		border-collapse:collapse;
+		
+    }
+	div.topDiv{
+
+        overflow:scroll;
+		-webkit-overflow-scrolling: touch;
+    }
+	 div.downDiv{
+        overflow:scroll;
+		height: 520px;
+		-webkit-overflow-scrolling: touch;		
+    }
+    .red{
+    	background-color: #F92626;
+    }
+    td{
+    	text-align: center;
+    }
+	
+</style>
+<div id="app" v-cloak>
+
+	<mt-button size="small " type="primary" @click.native="selectPO_Pomain" style="visibility:hidden">查询
+	</mt-button>
+	<div style="border:1px solid black">
+		<select v-model="chooseWharehouse">
+			<option value="">选择仓库</option>
+			<option :value="list.cWhCode" v-for="list in listWharehouse">{{list.cWhCode}} {{list.cWhName}}</option>
+		</select>
+	<!--采购订单子表主表-->
+		<div  @scroll="topScrollEvent2" ref="topDiv2" class="topDiv">
+			<table class="topTable2" border="1">
+				<thead>
+					<tr>
+						<th style="width:100px">序号</th>
+						<th style="width:100px">选择</th>
+						<th style="width:100px">POID</th>
+						<th style="width:100px">id</th>
+						<th style="width:100px">仓库</th>
+						<th style="width:100px">生产编号</th>
+						<th style="width:100px">存货编码</th>
+						<th style="width:100px">存货名称</th>
+						<th style="width:100px">规格型号</th>
+						<th style="width:100px">单位</th>
+						<th style="width:100px">数量</th>
+						<th style="width:100px">已入库数量</th>
+						<th style="width:100px">待入库数量</th>
+						<th style="width:100px">本次入库数量</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		
+		<!--采购订单子表子表div-->
+		<div ref="downDiv2" @scroll="downScrollEvent2" class="downDiv">
+
+			<table class="downTable2" border="1">
+				<tbody  id="list_info">
+					<tr v-for="(pO_PODetails,,index) in pO_PODetailsArray" class="red">
+						<td style="width:100px">{{index+1}}</td>
+						<td style="width:100px;text-align:center" >
+							<input type="checkbox" v-model="pO_PODetails.checked" :value="pO_PODetails.checked"/>
+						</td>
+						<td style="width:100px">{{pO_PODetails.pOID}}</td>
+						<td style="width:100px">{{pO_PODetails.id}}</td>
+						<td style="width:100px" align="center"  >
+							<select  v-model="pO_PODetails.cWhCode" style="width: 98%;" >
+								<option :value="list.cWhCode" v-for="list in listWharehouse">{{list.cWhCode}} {{list.cWhName}}</option>
+							</select>
+						</td>
+						<td style="width:100px">{{pO_PODetails.productionCode}}</td>
+						<td style="width:100px">{{pO_PODetails.inventory.cInvCode}}</td>
+						<td style="width:100px">{{pO_PODetails.inventory.cInvName}}</td>
+						<td style="width:100px">{{pO_PODetails.inventory.cInvStd}}</td>
+						<td style="width:100px">{{pO_PODetails.inventory.computationUnit.cComunitName}}</td>	
+						<td style="width:100px">{{pO_PODetails.iQuantity}}</td>
+						<td style="width:100px">{{pO_PODetails.iReceivedQTY}}</td>
+						<td style="width:100px">{{pO_PODetails.iQuantity - pO_PODetails.iReceivedQTY}}</td>
+						<td style="width:100px" align="center">
+							<input type="number" style="width: 50px;" :value="pO_PODetails.nowiReceivedQTY" v-model.number="pO_PODetails.nowiReceivedQTY" @change="bgColor(index)">
+						</td>					
+					</tr>              
+				</tbody>
+			</table>
+			<mt-button size="small " type="primary" @click.native="submitPO_Podetails" :disabled="isDisable">提交</mt-button>
+		</div>
+	</div>
+</div>
+
+<!-- 先引入 Vue -->
+<script src="./js/vue/vue2.6.10.js"></script>
+<script src="./js/jquery/jquery3.4.1.js" ></script>
+<!-- 引入组件库 -->
+<script src="./js/mint/index.js"></script>
+<!--引入axios-->
+<script src="./js/vue/axios.min.js"></script>
+<script src="./js/setting.js"></script>
+<script type="text/javascript">
+	var pO_PODetailsArray = JSON.parse(localStorage.getItem("pO_PODetailsArray"));
+	for (var i = 0; i< pO_PODetailsArray.length; i++) {
+		pO_PODetailsArray[i].nowiReceivedQTY = 0;
+	}
+	var vue = new Vue({
+		el: "#app",
+		data: {
+			pO_PODetailsArray: pO_PODetailsArray,
+			chooseWharehouse: '',
+			listWharehouse: [],
+			isDisable: false
+		},
+		methods: {
+			topScrollEvent:function(e){
+			    this.$refs.downDiv.scrollLeft=this.$refs.topDiv.scrollLeft;
+		    },
+		    downScrollEvent:function(e){
+		    	this.$refs.topDiv.scrollLeft=this.$refs.downDiv.scrollLeft;		   
+		    },
+			topScrollEvent2:function(e){
+			    this.$refs.downDiv2.scrollLeft=this.$refs.topDiv2.scrollLeft;
+		    },
+		    downScrollEvent2:function(e){
+		    	this.$refs.topDiv2.scrollLeft=this.$refs.downDiv2.scrollLeft;		  
+		    },
+		    addiReceivedQTY: function(val) {
+		    	var temp = [];
+		    	for (var i = 0; i < this.pO_PODetailsArray.length; i++) {
+		    		if (this.pO_PODetailsArray[i].inventory.cInvCode == val) {
+		    			temp.push(i);
+		    		}
+		    	}
+		    	if (temp.length > 1) {
+		    		vue.$messagebox.alert("记录中有至少两条相同的存货编码，请在第"+temp.join(", ")+"手动输入存货数量！");
+		    	} else if (temp.length == 1) {
+		    		this.pO_PODetailsArray[temp[0]].nowiReceivedQTY++;
+		    		this.bgColor(temp[0]);
+		    	}else {
+		    		vue.$messagebox.alert('存货信息不存在！');
+		    	}
+		    },
+		    bgColor: function(index) {
+		    	var list_page = document.getElementById('list_info').childNodes[index];	    	
+		    	if (this.pO_PODetailsArray[index].nowiReceivedQTY < (this.pO_PODetailsArray[index].iQuantity - this.pO_PODetailsArray[index].iReceivedQTY)) {
+		    		list_page.style.backgroundColor = "#F92626";
+		    	}else if (this.pO_PODetailsArray[index].nowiReceivedQTY == (this.pO_PODetailsArray[index].iQuantity - this.pO_PODetailsArray[index].iReceivedQTY)) {
+		    		list_page.style.backgroundColor = "green";
+		    	}else {
+		    		list_page.style.backgroundColor = "yellow";
+		    	}
+		    },
+		    checkData: function(data) {
+		    	for (var i = 0; i< data.length; i++) {
+		    		var index = pO_PODetailsArray.indexOf(data[i])+1;
+		    		if (data[i].checked == false) {
+		    			data.splice(i, 1);
+		    			i--;
+		    		}else if (data[i].cWhCode ==null) {
+		    			vue.$messagebox.alert("第"+index+"条订单的仓库不能为空！");
+		    			return false;
+		    		}else if (data[i].nowiReceivedQTY == 0) {
+		    			vue.$messagebox.alert("第"+index+"条订单的本次入库数量不能为空！");
+		    			return false;
+		    		}else if (data[i].nowiReceivedQTY > (data[i].iQuantity - data[i].iReceivedQTY)) {
+		    			vue.$messagebox.alert("第"+index+"条订单的本次入库数量不能大于入库上限范围！");
+		    			return false;
+		    		}
+		    	}
+		    	return data;
+		    },
+		    submitPO_Podetails: function() {
+		    	var that = this;
+		    	var submitData = this.pO_PODetailsArray.slice();
+		    	this.isDisable = true;
+		    	setTimeout(function() {
+		    		that.isDisable = false;
+		    	},1000);
+		    	submitData = this.checkData(submitData);
+		    	if (!submitData) return;
+		    	if (submitData.length == 0) {
+		    		vue.$messagebox.alert("请勾选所属子项", "错误");
+		    		return;
+		    	};
+		    	var url = "http://192.168.1.104:8082/submitPO_Podetails";
+		    	axios.post(url,pO_PODetailsArray)
+		    	.then(function(response){
+		    		vue.$messagebox.alert(response.data);
+		    	})
+		    	.catch(function(e){
+		    		vue.$messagebox.alert(e, '错误');
+		    	});
+		    },
+		},
+		watch: {
+			chooseWharehouse: function(val) {
+				for (var i = 0; i < this.pO_PODetailsArray.length; i++) {
+					this.pO_PODetailsArray[i].cWhCode = val;
+				}
+			}
+		},
+		created: function() {
+			var url =  getUrl()+"getcWhCodeList";
+		    axios.get(url)
+		   	.then(function(response){
+		   		var cWhCodeList = response.data;
+	   			for (var i in cWhCodeList) {
+	   				vue.listWharehouse.push(cWhCodeList[i]);
+		   		}
+	    	})
+	    	.catch(function(e){
+		    	// vue.$messagebox.alert(e, '错误');
+		    });
+		},
+		mounted: function(){
+			this.$nextTick(function(){
+				var list_page = document.getElementById('list_info');
+				for (var i = 0; i < pO_PODetailsArray.length; i++) {
+					if ((pO_PODetailsArray[i].iQuantity-pO_PODetailsArray[i].iReceivedQTY) < 0) {
+						list_page.childNodes[i].style.backgroundColor = "yellow";
+					}else if ((pO_PODetailsArray[i].iQuantity-pO_PODetailsArray[i].iReceivedQTY) == 0)
+						list_page.childNodes[i].style.backgroundColor = "green";    	
+				}
+			});
+		}
+	
+})
+</script>	
