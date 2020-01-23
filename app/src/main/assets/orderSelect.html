@@ -69,7 +69,7 @@
 	<div>
 		<input type="text" placeholder="请输入采购订单号" class="condition"/>
 		<input type="text" placeholder="请输入供应商名称" class="condition"/>
-		<mt-button size="small" type="primary" @click.native="selectPO_Pomain">查询</mt-button>
+		<mt-button size="small" type="primary" @click.native="selectPO_Pomain" :disabled="isDisable">查询</mt-button>
 	</div>
 	
 	<div style="border:1px solid black">
@@ -186,7 +186,8 @@ alert(e);
         data:{
             pO_POMainArray:[],
             pO_PODetailsArray:[],			
-			minEndId:-1
+			minEndId:-1,
+			isDisable: false
         },
         methods:{
 		
@@ -195,6 +196,11 @@ alert(e);
 				alert("ok")
 			},
 			selectPO_Pomain:function(){
+				var that = this;
+		    	this.isDisable = true;
+		    	setTimeout(function() {
+		    		that.isDisable = false;
+		    	},1000);
 				var url = getUrl()+"listPO_Pomain?bFinished=false&endId=-1"
 				this.pO_POMainArray=[]
 				this.pO_PODetailsArray=[]
@@ -287,13 +293,14 @@ alert(e);
 				}
 			},
 			jumpOderInstock:function(){	
+				if (this.pO_PODetailsArray.length == 0) {
+					vue.$messagebox.alert("请选择所属子项！", '错误');
+					return;
+				}
 				window.localStorage.clear();
-
 				if (typeof(Storage) !== "undefined") {
 					localStorage.setItem("pO_PODetailsArray", JSON.stringify(this.pO_PODetailsArray))
 					makeJava.jumpHtml("file:///android_asset/inStockByOder.html")
-
-    
 				} else {
     				alert("Sorry, your browser does not support Web Storage...")
 				}

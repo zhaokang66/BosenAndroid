@@ -26,32 +26,23 @@ table{
 	border-collapse:collapse;
 
 }
-div.topDiv{
-
-	overflow:scroll;
-	-webkit-overflow-scrolling: touch;
-}
-div.downDiv{
-	overflow:scroll;
-	height: 520px;
-	-webkit-overflow-scrolling: touch;		
-}
-td{
+th, td{
 	text-align: center;
 }
 .inventoryBox{
 	width: 100%;
-	height: 1044px;
-
+	height: 1062px;
 }
 .inventoryMenu{
-	width: 24%;			
+	width: 140px;			
+	float: left;
+	background-clip: black;
 	float: left;
 }
 .inventoryList{
-	width: 74%;
 	height: 520px;
 	float: left;
+	text-align: center;
 }
 .eachInventoy{
 	cursor: pointer;
@@ -90,8 +81,7 @@ td{
 		</select>
 		<label>备注：</label>
 		<input type="text" name="cMemo" v-model="cMemo">
-		<!--采购订单子表主表-->
-		<div  @scroll="topScrollEvent2" ref="topDiv2" class="topDiv">
+		<div>
 			<table class="topTable2" border="1">
 				<thead>
 					<tr>
@@ -109,9 +99,7 @@ td{
 			</table>
 		</div>
 		
-		<!--采购订单子表子表div-->
-		<div ref="downDiv2" @scroll="downScrollEvent2" class="downDiv">
-
+		<div>
 			<table class="downTable2" border="1">
 				<tbody  id="list_info">
 					<tr v-for="(v,index) in otherInRdrecord" >
@@ -129,7 +117,6 @@ td{
 							<input type="text" style="width: 98%;padding-right: 20px;" :value="v.cInvCode" @change="checkCInvCode(index)" v-model="v.cInvCode">
 
 						</td>
-
 						<td style="width:100px">{{v.cInvName}}</td>
 						<td style="width:100px">{{v.cInvStd}}</td>
 						<td style="width:100px">{{v.cComunitName}}</td>
@@ -143,11 +130,12 @@ td{
 					</tr>              
 				</tbody>	
 			</table>
+
 			<mt-button size="small " type="primary" @click.native="submitotherInRrecord" :disabled="isDisable">提交</mt-button>
 		</div>
 	</div>
 
-
+<!-- 模态框 显示存货信息 -->
 	<div class="modal fade" id="inventoryInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -156,109 +144,94 @@ td{
 						&times;
 					</button>
 				</div>
-
 				<!-- 这里是内容 -->
 				<div class="inventoryBox">
 
-
 					<div class="inventoryMenu">
 						<ul class="nav nav-pills nav-stacked">
-
-							<li role="presentation" id="menu">
-								<a href="#parent" class="nav-header collapsed" data-toggle="collapse" id="collapseParent" onclick="chevron_toggle()">分类<span class="pull-right glyphicon glyphicon-chevron-down"></span></a>
-								<ul id="parent" class="nav nav-list collapse secondaryTitle" >
-
-									<li>
-										<a href="#listone" class="nav-header collapsed" data-toggle="collapse" id="collapseParent" onclick="chevron_toggle()">01原材料<span class="pull-right glyphicon glyphicon-chevron-down"></span></a>
-										<ul id="listone" class="nav nav-list collapse">
-											<li><a href="#" @click="setCInvCCode('0101')">0101冲压材料</a></li>
-											<li><a href="#" @click="setCInvCCode('0102')">0102弹簧材料</a></li>
-											<li><a href="#" @click="setCInvCCode('0103')">0103油管材料</a></li>
-											<li><a href="#" @click="setCInvCCode('0104')">0104机加工材料</a></li>
-											<li><a href="#" @click="setCInvCCode('0105')">0105橡胶材料</a></li>
-										</ul>
-									</li>
-
-									<li>
-										<a href="#listtwo" class="nav-header collapsed" data-toggle="collapse" id="collapseParent" onclick="chevron_toggle()">02半成品<span class="pull-right glyphicon glyphicon-chevron-down"></span></a>
-										<ul id="listtwo" class="nav nav-list collapse">
-											<li><a href="#" @click="setCInvCCode('0201')">0201冲压件</a></li>
-											<li><a href="#"  @click="setCInvCCode('0202')">0202弹簧件</a></li>
-											<li><a href="#"  @click="setCInvCCode('0203')">0203油管</a></li>
-											<li><a href="#"  @click="setCInvCCode('0204')">0204机加工</a></li>
-											<li><a href="#"  @click="setCInvCCode('0205')">0205橡胶件</a></li>
-											<li><a href="#"  @click="setCInvCCode('0206')">0206橡胶件</a></li>
-										</ul>
-									</li>
-
-									<li>
-										<a href="#listthree" class="nav-header collapsed" data-toggle="collapse" id="collapseParent" onclick="chevron_toggle()">03产成品<span class="pull-right glyphicon glyphicon-chevron-down"></span></a>
-										<ul id="listthree" class="nav nav-list collapse">
-											<li><a href="#" @click="setCInvCCode('0301')">0301冲压件</a></li>
-											<li><a href="#" @click="setCInvCCode('0302')">0302弹簧件</a></li>
-											<li><a href="#" @click="setCInvCCode('0303')">0303油管</a></li>
-											<li><a href="#" @click="setCInvCCode('0304')">0304机加工</a></li>
-											<li><a href="#" @click="setCInvCCode('0305')">0305橡胶产品</a></li>
-											<li><a href="#" @click="setCInvCCode('0306')">0306维修包</a></li>
-											<li><a href="#" @click="setCInvCCode('0307')">0307报警线</a></li>
-											<li><a href="#" @click="setCInvCCode('0310')">0310其他</a></li>
-										</ul>
-									</li>
-
-									<li>
-										<a href="#" >04低值易耗品</a>
-									</li>
-									<li>
-										<a href="#" >05五金类</a>
-									</li>
-									<li>
-										<a href="#">06费用类</a>
-									</li>
+							<li>
+								<a href="#listone" class="nav-header collapsed" data-toggle="collapse" id="collapseParent" onclick="chevron_toggle()">01原材料<span class="pull-right glyphicon glyphicon-chevron-down"></span></a>
+								<ul id="listone" class="nav nav-list collapse">
+									<li><a href="#" @click="setCInvCCode('0101')">0101冲压材料</a></li>
+									<li><a href="#" @click="setCInvCCode('0102')">0102弹簧材料</a></li>
+									<li><a href="#" @click="setCInvCCode('0103')">0103油管材料</a></li>
+									<li><a href="#" @click="setCInvCCode('0104')">0104机加工材料</a></li>
+									<li><a href="#" @click="setCInvCCode('0105')">0105橡胶材料</a></li>
 								</ul>
+							</li>
+
+							<li>
+								<a href="#listtwo" class="nav-header collapsed" data-toggle="collapse" id="collapseParent" onclick="chevron_toggle()">02半成品<span class="pull-right glyphicon glyphicon-chevron-down"></span></a>
+								<ul id="listtwo" class="nav nav-list collapse">
+									<li><a href="#" @click="setCInvCCode('0201')">0201冲压件</a></li>
+									<li><a href="#"  @click="setCInvCCode('0202')">0202弹簧件</a></li>
+									<li><a href="#"  @click="setCInvCCode('0203')">0203油管</a></li>
+									<li><a href="#"  @click="setCInvCCode('0204')">0204机加工</a></li>
+									<li><a href="#"  @click="setCInvCCode('0205')">0205橡胶件</a></li>
+									<li><a href="#"  @click="setCInvCCode('0206')">0206橡胶件</a></li>
+								</ul>
+							</li>
+
+							<li>
+								<a href="#listthree" class="nav-header collapsed" data-toggle="collapse" id="collapseParent" onclick="chevron_toggle()">03产成品<span class="pull-right glyphicon glyphicon-chevron-down"></span></a>
+								<ul id="listthree" class="nav nav-list collapse">
+									<li><a href="#" @click="setCInvCCode('0301')">0301冲压件</a></li>
+									<li><a href="#" @click="setCInvCCode('0302')">0302弹簧件</a></li>
+									<li><a href="#" @click="setCInvCCode('0303')">0303油管</a></li>
+									<li><a href="#" @click="setCInvCCode('0304')">0304机加工</a></li>
+									<li><a href="#" @click="setCInvCCode('0305')">0305橡胶产品</a></li>
+									<li><a href="#" @click="setCInvCCode('0306')">0306维修包</a></li>
+									<li><a href="#" @click="setCInvCCode('0307')">0307报警线</a></li>
+									<li><a href="#" @click="setCInvCCode('0310')">0310其他</a></li>
+								</ul>
+							</li>
+
+							<li>
+								<a href="#" >04低值易耗品</a>
+							</li>
+							<li>
+								<a href="#" >05五金类</a>
+							</li>
+							<li>
+								<a href="#">06费用类</a>
 							</li>
 						</ul>
 					</div>
 
-					<div class="inventoryList">
-						<div style="overflow: scroll;text-align: center; "  @scroll="topScrollEvent3" ref="inventoryTopDiv" id="inventoryTopDiv">
-							<table  border="1" style="border-collapse:collapse">
-								<thead>
-									<tr >
-										<th style="width: 100px;">存货编码</th>
-										<th style="width: 100px;">存货代码</th>
-										<th style="width: 100px;">存货名称</th>
-										<th style="width: 100px;">规格型号</th>
-										<th style="width: 100px;">计量单位</th>
-									</tr>
+					<div class="inventoryList" style="width: 180px;">
+					<div style="width:180px;overflow:scroll;" @scroll="topScrollEvent" ref="topDiv" id="topDiv">
+						<table width="500" border="1" style="border-collapse:collapse;"align="center">
+							<thead>
+								<tr>
+									<th style="width: 100px;">存货编码</th>
+									<th style="width: 100px;">存货代码</th>
+									<th style="width: 100px;">存货名称</th>
+									<th style="width: 100px;">规格型号</th>
+									<th style="width: 100px;">计量单位</th>
 								</thead>
 							</table>
 						</div>
-						<div style="overflow: scroll;height: 977px;"  @scroll="downScrollEvent3" ref="inventoryDownDiv" id="inventoryDownDiv">
-							<table border="1" 
-								v-infinite-scroll="loadMore"
-				  	 			infinite-scroll-disabled="loading"
-				   				infinite-scroll-distance="50"
-							>
-								<tbody>
 
-									<tr v-for="inventory in inventoryArray" class="eachInventoy" id="eachInventoy" @mouseenter="inventoryMouseOver" @mouseleave="inventoryMouseOut" @click="addData">
-										<th style="width: 100px;" :cInvCode="inventory.cInvCode" :cVenCode="inventory.cVenCode">{{inventory.cInvCode}}</th>
-										<th style="width: 100px;">{{inventory.cInvAddCode}}</th>
-										<th style="width: 100px;" :cInvName="inventory.cInvName">{{inventory.cInvName}}</th>
-										<th style="width: 100px;" :cInvStd="inventory.cInvStd">{{inventory.cInvStd}}</th>
-										<th style="width: 100px;" :cComunitName="inventory.computationUnit.cComunitName">{{inventory.computationUnit.cComunitName}}</th>
-									</tr>
-								</tbody>
-							</table>
-						</div>
+						<div style="width:180px;height:1006px;overflow:scroll"  ref="downDiv" @scroll="downScrollEvent" id="downDiv" >
+							<table width="500" border="1" style="border-collapse:collapse" v-infinite-scroll="loadMore"
+							infinite-scroll-disabled="loading"
+							infinite-scroll-distance="10">
+							<tbody>
+								<tr v-for="inventory in inventoryArray" class="eachInventoy" id="eachInventoy" @mouseenter="inventoryMouseOver" @mouseleave="inventoryMouseOut" @click="addData">
+									<th style="width: 100px;" :cInvCode="inventory.cInvCode" :cVenCode="inventory.cVenCode">{{inventory.cInvCode}}</th>
+									<th style="width: 100px;">{{inventory.cInvAddCode}}</th>
+									<th style="width: 100px;" :cInvName="inventory.cInvName">{{inventory.cInvName}}</th>
+									<th style="width: 100px;" :cInvStd="inventory.cInvStd">{{inventory.cInvStd}}</th>
+									<th style="width: 100px;" :cComunitName="inventory.computationUnit.cComunitName">{{inventory.computationUnit.cComunitName}}</th>
+								</tr>
+							</tbody>
+						</table>
 					</div>
-
-
+					</div>
 				</div>
 			</div><!-- /.modal-content -->
 		</div><!-- /.modal -->
 	</div>
-	
 </div>
 
 <!-- 先引入 Vue -->
@@ -296,31 +269,13 @@ td{
 		},
 		methods: {
 			topScrollEvent:function(e){
-
-				this.$refs.downDiv.scrollLeft=this.$refs.topDiv.scrollLeft;
-
+				this.$refs.downDiv.scrollLeft=this.$refs.topDiv.scrollLeft;				
 			},
 			downScrollEvent:function(e){
 				this.$refs.topDiv.scrollLeft=this.$refs.downDiv.scrollLeft;
-
-			},
-			topScrollEvent2:function(e){
-
-				this.$refs.downDiv2.scrollLeft=this.$refs.topDiv2.scrollLeft;
-
-			},
-			downScrollEvent2:function(e){
-				this.$refs.topDiv2.scrollLeft=this.$refs.downDiv2.scrollLeft;
-
-			},
-			topScrollEvent3: function(e){
-				this.$refs.inventoryTopDiv.scrollLeft=this.$refs.inventoryDownDiv.scrollLeft;
-			},
-			downScrollEvent3: function(e){
-				this.$refs.inventoryDownDiv.scrollLeft=this.$refs.inventoryTopDiv.scrollLeft;
+				this.$refs.topDiv.scrollTop=0;				
 			},
 			inventoryMouseOver: function(e) {
-				// console.log(e.target)
 				var target = e.target;
 				target.style.backgroundColor = "grey";
 
@@ -393,6 +348,7 @@ td{
 				});
 				return res;
 			},
+			
 		    //扫码器调用的方法
 		    addiReceivedQTY: function(val) {
 		    	if (this.chooseWharehouse == '') {
@@ -423,7 +379,6 @@ td{
 		    	}
 		    },
 		    loadMore: function () {
-
 		    	this.loading = true;
 		    	vue.limit += 50;
 		    	if (vue.limit != 50) {
@@ -436,6 +391,9 @@ td{
 		    		vue.$messagebox.alert("请先选择仓库！","错误");
 		    		return;
 		    	}
+		    	alert("赋值前："+vue.limit)
+		    	vue.limit = 50;
+		    	alert("赋值后"+vue.limit)
 		    	vue.cInvCCode = cInvCCode;
 		    	$('#inventoryInfo').modal('show');
 		    	vue.inventoryArray = [];
@@ -443,7 +401,6 @@ td{
 		    },
 		    selectInventory: function() {		    	
 		    	var url = getUrl() + "listInventory?cInvCCode="+vue.cInvCCode+"&limit="+vue.limit;
-		    	alert(url)
 		    	axios.get(url).then(function(response){
 		    		var jsonObject = response.data;
 		    		if (jsonObject.length == 0) return;

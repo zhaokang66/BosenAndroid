@@ -14,7 +14,7 @@
         display: none;
 	}
 	#app{
-		min-width: 1857px;
+		min-width: 1600px;
 	}
 	table{
         word-break:break-all;
@@ -47,13 +47,18 @@
 			<option value="">选择仓库</option>
 			<option :value="list.cWhCode" v-for="list in listWharehouse">{{list.cWhCode}} {{list.cWhName}}</option>
 		</select>
+		<select v-model="chooseCRdCode">
+			<option value="">选择入库类别</option>
+			<option :value="list.cRdCode" v-for="list in listRdStyle">{{list.cRdCode}} {{list.cRdName}}</option>
+		</select>
+		<label>备注：</label>
+		<input type="text" name="" :value="poCMemo" v-model="poCMemo">
 	<!--采购订单子表主表-->
 		<div  @scroll="topScrollEvent2" ref="topDiv2" class="topDiv">
 			<table class="topTable2" border="1">
 				<thead>
 					<tr>
 						<th style="width:100px">序号</th>
-						<th style="width:100px">选择</th>
 						<th style="width:100px">ID</th>
 						<th style="width:100px">MainId</th>
 						<th style="width:100px">生产计划号</th>
@@ -81,9 +86,6 @@
 				<tbody  id="list_info">
 					<tr v-for="(pp_Pomain,index) in pp_PomainArray" class="red">
 						<td style="width:100px">{{index+1}}</td>
-						<td style="width:100px;text-align:center" >
-							<input type="checkbox" v-model="pp_Pomain.checked" :value="pp_Pomain.checked"/>
-						</td>
 						<td style="width:100px">{{pp_Pomain.id}}</td>
 						<td style="width:100px">{{pp_Pomain.mainId}}</td>
 						<td style="width:100px">
@@ -104,7 +106,7 @@
 						<td style="width:100px">{{pp_Pomain.fInQuantity}}</td>
 						<td style="width:100px">{{pp_Pomain.fQuantity - pp_Pomain.fInQuantity}}</td>
 						<td style="width:100px" align="center">
-							<input type="number" style="width: 50px;" :value="pp_Pomain.nowiReceivedQTY" v-model.number="pp_Pomain.nowiReceivedQTY" @change="bgColor(index)">
+							<input type="number" style="width: 98%;" :value="pp_Pomain.nowiReceivedQTY" v-model.number="pp_Pomain.nowiReceivedQTY" @change="bgColor(index)">
 						</td>					
 					</tr>              
 				</tbody>	
@@ -124,6 +126,8 @@
 <script src="./js/setting.js"></script>
 <script>
 	var pp_PomainArray = JSON.parse(localStorage.getItem("pp_PomainArray"));
+	var poCMemo = JSON.parse(localStorage.getItem("poCMemo"));
+
 	//初始化
 	for (var i = 0; i< pp_PomainArray.length; i++) {
 		pp_PomainArray[i].nowiReceivedQTY = 0;
@@ -136,7 +140,10 @@
 			pp_PomainArray: pp_PomainArray,
 			chooseWharehouse: '',
 			listWharehouse: [],
-			isDisable: false
+			isDisable: false,
+			poCMemo: poCMemo,
+			listRdStyle: [],
+			chooseCRdCode: ''
 		},
 		methods: {
 			topScrollEvent:function(e){
@@ -205,6 +212,9 @@
 		    	axios.post(url,submitData)
 		    	.then(function(response){
 		    		vue.$messagebox.alert(response.data);
+		    		setTimeout(function() {
+		    			makeJava.jumpHtml("file:///android_asset/index.html");	
+		    		},3000);	    			    
 		    	})
 		    	.catch(function(e){
 		    		vue.$messagebox.alert(e, '错误');
@@ -226,10 +236,7 @@
 
 		    	for (var i = 0; i < data.length; i++) {
 		    		var index = this.pp_PomainArray.indexOf(data[i])+1;
-		    		if (data[i].checked == false) {
-		    			data.splice(i, 1);
-		    			i--;
-		    		}else if (data[i].nowiReceivedQTY == 0){
+		    		if (data[i].nowiReceivedQTY == 0){
 		    			
 		    			vue.$messagebox.alert("第"+index+"条订单的本次入库数量不能为空！");
 		    			return false;
@@ -238,6 +245,8 @@
 		    			return false;
 		    		}else {
 		    			data[i].cWhCode = this.chooseWharehouse;
+		    			data[i].cMemo = this.poCMemo;
+		    			data[i].cRdCode = this.chooseCRdCode;
 		    		}
 		    	}
 		    	return data;
@@ -259,9 +268,20 @@
 		   		}
 	    	})
 	    	.catch(function(e){
-		    	// vue.$messagebox.alert(e, '错误');
-		    	vue.$messagebox.alert("网络连接错误，请稍后重试！","错误")
+		    	vue.$messagebox.alert(e, '错误');
 		    });
+
+		    axios.get(getUrl()+"getRdStyleList?bRdFlag=1")
+			.then(function(response){
+				var cRdStyleList = response.data;
+				for (var i in cRdStyleList) {
+	   				// console.log(vue.listWharehouse)
+	   				vue.listRdStyle.push(cRdStyleList[i]);
+	   			}
+	   		})
+			.catch(function(e){
+				vue.$messagebox.alert(e, '错误');
+			});
 		},
 		//页面初始化调整背景颜色
 		mounted: function(){

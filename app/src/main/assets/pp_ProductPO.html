@@ -1,62 +1,62 @@
 <!DOCTYPE html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!-- 引入样式 -->
-    <link rel="stylesheet" href="./css/mint/style.min.css">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<!-- 引入样式 -->
+	<link rel="stylesheet" href="./css/mint/style.min.css">
 	
 </head>
 
 <style>
-	[v-cloak] {
-            display: none;
-    }
-	/*HTML5 元素超出部分滚动, 并隐藏滚动条*/
-	div::-webkit-scrollbar {
-        display: none;
-	}
+[v-cloak] {
+	display: none;
+}
+/*HTML5 元素超出部分滚动, 并隐藏滚动条*/
+div::-webkit-scrollbar {
+	display: none;
+}
 <!-- 	div::-webkit-scrollbar {
-		width:0px;
-		touch
+	width:0px;
+	touch
 	} -->
 
-    table{
-        word-break:break-all;
-        word-wrap:break-word;
-        text-align: center;
+	table{
+		word-break:break-all;
+		word-wrap:break-word;
+		text-align: center;
 		
-    }
+	}
 
-    div.topDiv{
+	div.topDiv{
 
-        overflow:scroll;
+		overflow:scroll;
 		-webkit-overflow-scrolling: touch;
-    }
+	}
 
-    div.downDiv{
+	div.downDiv{
 
-        overflow:scroll;
+		overflow:scroll;
 		height:230px;
 		-webkit-overflow-scrolling: touch;		
-    }
+	}
 
-    table.topTable{
-        width:600px;
-        border-collapse:collapse;
-    }	
+	table.topTable{
+		width:600px;
+		border-collapse:collapse;
+	}	
 	table.downTable{
-        width:600px;
-        border-collapse:collapse;
-	
-    }
+		width:600px;
+		border-collapse:collapse;
+
+	}
 	table.topTable2{
-        width:1200px;
-        border-collapse:collapse;
-    }	
+		width:1200px;
+		border-collapse:collapse;
+	}	
 	table.downTable2{
-        width: 1200px;
-        border-collapse:collapse;
-    }
-   
+		width: 1200px;
+		border-collapse:collapse;
+	}
+
 	input.condition{
 		width:100px;
 		height:20px;
@@ -65,43 +65,45 @@
 </style>
 
 <body>
-<div id="app" v-cloak>
+	<div id="app" v-cloak>
 
-	<div>
-		<input type="text" placeholder="请输入采购订单号" class="condition"/>
-		<input type="text" placeholder="请输入供应商名称" class="condition"/>
-		<mt-button size="small" type="primary" @click.native="selectPP_ProductPO">查询</mt-button>
-	</div>
-	
-	<div style="border:1px solid black">
-		<!--主表-->
-		<div  @scroll="topScrollEvent" ref="topDiv" class="topDiv" >
-			<table class="topTable" border="1">
-				<thead>
-					<tr>	
-						<th style="width:100px">选择</th>	
-						<th style="width:100px">ID</th>	
-						<th style="width:100px">生产订单号</th>
-						<th style="width:100px">部门</th>
-						<th style="width:100px">单据日期</th	>
-						<th style="width:100px">备注</th>
-					</tr>
-				</thead>
-			</table>
+		<div>
+			<input type="text" placeholder="请输入采购订单号" class="condition"/>
+			<input type="text" placeholder="请输入供应商名称" class="condition"/>
+			<mt-button size="small" type="primary" @click.native="selectPP_ProductPO">查询</mt-button>
 		</div>
-		
-		<!--子表div-->
-		<div ref="downDiv" @scroll="downScrollEvent" class="downDiv" >
 
-			<table v-infinite-scroll="loadMore"
-				   infinite-scroll-disabled="loading"
-				   infinite-scroll-distance="50"
-				   class="downTable"
-				   border="1">
+		<div style="border:1px solid black">
+			<!--主表-->
+			<div  @scroll="topScrollEvent" ref="topDiv" class="topDiv" >
+				<table class="topTable" border="1">
+					<thead>
+						<tr>	
+							<th style="width:100px">选择</th>	
+							<th style="width:100px">ID</th>	
+							<th style="width:100px">生产订单号</th>
+							<th style="width:100px">部门</th>
+							<th style="width:100px">单据日期</th	>
+							<th style="width:100px">备注</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+
+			<!--子表div-->
+			<div ref="downDiv" @scroll="downScrollEvent" class="downDiv" >
+
+				<table v-infinite-scroll="loadMore"
+				infinite-scroll-disabled="loading"
+				infinite-scroll-distance="50"
+				class="downTable"
+				border="1">
 				<tbody>
 					<tr v-for="pp_ProductPO in pp_ProductPOArray">
-						<td style="width:100px "  align="center" @click="checkboxClick"  class="inputTd"><input type="checkbox" v-model="pp_ProductPO.checked"  :id="pp_ProductPO.id"
-							:cDepName="pp_ProductPO.cDepName"/></td>
+						<td style="width:100px "  align="center" @click="checkboxClick"  class="inputTd">
+							<input type="checkbox" v-model="pp_ProductPO.checked"  :id="pp_ProductPO.id" :cMemo="pp_ProductPO.cMemo"
+							:cDepName="pp_ProductPO.cDepName" />
+						</td>
 						<td style="width:100px">{{pp_ProductPO.id}}</td>
 						<td style="width:100px">{{pp_ProductPO.cCode}}</td>
 						<td style="width:100px">{{pp_ProductPO.cDepName}}</td>
@@ -109,13 +111,13 @@
 						<td style="width:100px">{{pp_ProductPO.cMemo}}</td>					
 					</tr>              
 				</tbody>
-				
+
 			</table>
 		</div>
 	</div>
 	<br>
 	<div style="border:1px solid black">
-	<!--采购订单子表主表-->
+		<!--采购订单子表主表-->
 		<div  @scroll="topScrollEvent2" ref="topDiv2" class="topDiv">
 			<table class="topTable2" border="1">
 				<thead>
@@ -130,13 +132,14 @@
 						<th style="width:100px">开工日期</th>
 						<th style="width:100px">完工日期</th>
 						<th style="width:100px">单位</th>
+						<th style="width:100px">备注</th>
 						<th style="width:100px">应入库数量</th>
 						<th style="width:100px">已入库数量</th>
 					</tr>
 				</thead>
 			</table>
 		</div>
-		
+
 		<!--采购订单子表子表div-->
 		<div ref="downDiv2" @scroll="downScrollEvent2" class="downDiv">
 
@@ -154,6 +157,7 @@
 						<td style="width:100px">{{pp_Pomain.dStartDate}}</td>
 						<td style="width:100px">{{pp_Pomain.dEndDate}}</td>
 						<td style="width:100px">{{pp_Pomain.inventory.computationUnit.cComunitName}}</td>	
+						<td style="width:100px">{{pp_Pomain.cMemo}}</td>
 						<td style="width:100px">{{pp_Pomain.fQuantity}}</td>
 						<td style="width:100px">{{pp_Pomain.fInQuantity}}</td>
 
@@ -183,52 +187,53 @@
 <script>
 //设置axios的默认超时时间
 axios.defaults.timeout = 10000;		 
-    var vue=new Vue({
-        el:"#app",
-        data:{
-            pp_ProductPOArray:[],
-            pp_PomainArray:[],			
-			minEndId:-1,
-			isDisable: true,
-			cDepName: []
-        },
-        methods:{
-			selectPP_ProductPO:function(){
-				var url = getUrl()+"listPP_ProductPO?bFinished=false&endId=-1&detailsFinshed=true"
-				this.pp_ProductPOArray=[]
-				this.pp_PomainArray=[]
-				this.doLoadMore(url)
-			},
+var vue=new Vue({
+	el:"#app",
+	data:{
+		pp_ProductPOArray:[],
+		pp_PomainArray:[],			
+		minEndId:-1,
+		isDisable: true,
+		cDepName: [],
+		poCMemo: ''
+	},
+	methods:{
+		selectPP_ProductPO:function(){
+			var url = getUrl()+"listPP_ProductPO?bFinished=false&endId=-1&detailsFinshed=true"
+			this.pp_ProductPOArray=[]
+			this.pp_PomainArray=[]
+			this.doLoadMore(url)
+		},
             //加载更多
             loadMore:function(){
-				this.loading = true;
-				if(this.minEndId!=-1){
+            	this.loading = true;
+            	if(this.minEndId!=-1){
 					//alert(this.minEndId);
 					var url = getUrl()+"listPP_ProductPO?bFinished=false&detailsFinshed=true&endId="+this.minEndId;
 					this.doLoadMore(url)
 					
 				}
-                this.loading = false;
-            },      
+				this.loading = false;
+			},      
 			
 			
-		    topScrollEvent:function(e){
-			    this.$refs.downDiv.scrollLeft=this.$refs.topDiv.scrollLeft;
+			topScrollEvent:function(e){
+				this.$refs.downDiv.scrollLeft=this.$refs.topDiv.scrollLeft;
 
-		    },
-		    downScrollEvent:function(e){
-		    	this.$refs.topDiv.scrollLeft=this.$refs.downDiv.scrollLeft;
-			   
-		    },
+			},
+			downScrollEvent:function(e){
+				this.$refs.topDiv.scrollLeft=this.$refs.downDiv.scrollLeft;
+
+			},
 			topScrollEvent2:function(e){
 
-			    this.$refs.downDiv2.scrollLeft=this.$refs.topDiv2.scrollLeft;
+				this.$refs.downDiv2.scrollLeft=this.$refs.topDiv2.scrollLeft;
 
-		    },
-		    downScrollEvent2:function(e){
-		    	this.$refs.topDiv2.scrollLeft=this.$refs.downDiv2.scrollLeft;	  
-		    },
-		    doLoadMore:function(url){
+			},
+			downScrollEvent2:function(e){
+				this.$refs.topDiv2.scrollLeft=this.$refs.downDiv2.scrollLeft;	  
+			},
+			doLoadMore:function(url){
 
 				axios.get(url).then(function(response) {
 					// vue.$refs.topDiv.scrollLeft=0;
@@ -246,26 +251,29 @@ axios.defaults.timeout = 10000;
 				}).catch(function (e) {
 					vue.$messagebox.alert(e, '错误');
 				});
-		    },
+			},
 			checkboxClick:function(e){
-					
-				var target=e.target
-				if(e.target.getAttribute("class")=="inputTd"){
-					var target=e.target.firstChild
-					
-					if(target.checked)
-						target.checked=""
-					else
-						target.checked="checked"
+
+				var target = e.target;
+				console.log(target)
+
+				if (target.getAttribute("class")  == "inputTd") {
+					target = target.firstChild;
+					if (target.checked) 
+						target.checked = "";
+					else 
+						target.checked = "checked";
 				}
 				var ID=target.getAttribute("id");
-				if(target.checked){
+				if(target.checked){						
 					if (this.cDepName.length == 0) {
 						this.cDepName.push(target.getAttribute("cDepName"));
+						this.poCMemo = target.getAttribute("cMemo");
 					}else {
+						this.poCMemo = "";
 						if (this.cDepName.indexOf(target.getAttribute("cDepName")) == -1) {
-							vue.$messagebox.alert("请选择相同部门的生产订单!", '错误');
-							target.checked="";
+							target.checked = "";
+							alert("请选择相同部门的生产订单!", '错误');
 							return;
 						}else {
 							this.cDepName.push(target.getAttribute("cDepName"));
@@ -273,18 +281,19 @@ axios.defaults.timeout = 10000;
 					}
 					var url=getUrl()+"listPP_Pomain?ID="+ID+"&bFinished=false&detailsFinshed=true";
 					axios.get(url).then(function(response) {
-					vue.$refs.topDiv2.scrollLeft=0;			        
-					var jsonObject = response.data;						
-					for(each in jsonObject){
-						jsonObject[each].checked="true";
-					}
-					vue.pp_PomainArray=vue.pp_PomainArray.concat(jsonObject);
-					console.log(vue.pp_PomainArray)
-					// vue.pp_PomainSelection=vue.pp_PomainSelection.concat(jsonObject);
+						vue.$refs.topDiv2.scrollLeft=0;			        
+						var jsonObject = response.data;						
+						for(each in jsonObject){
+							jsonObject[each].checked="true";
+						}
+						console.log(vue.pp_PomainArray)
+						vue.pp_PomainArray=vue.pp_PomainArray.concat(jsonObject);
+						// vue.pp_PomainSelection=vue.pp_PomainSelection.concat(jsonObject);
 					}).catch(function (e) {
 						vue.$messagebox.alert(e, '错误');
 					});
 				}else{
+
 					if (this.cDepName.length != 0) {
 						this.cDepName.splice(this.cDepName.length-1,1);
 					}
@@ -300,27 +309,22 @@ axios.defaults.timeout = 10000;
 				window.localStorage.clear();
 				console.log(this.pp_PomainArray)
 				if (typeof(Storage) !== "undefined") {
-					localStorage.setItem("pp_PomainArray", JSON.stringify(this.pp_PomainArray))
-					makeJava.jumpHtml("file:///android_asset/ppInStockByOder.html")
-
-    
+					localStorage.setItem("pp_PomainArray", JSON.stringify(this.pp_PomainArray));
+					localStorage.setItem("poCMemo", JSON.stringify(this.poCMemo));
+					makeJava.jumpHtml("file:///android_asset/ppInStockByOder.html");
 				} else {
-    				alert("Sorry, your browser does not support Web Storage...")
+					alert("Sorry, your browser does not support Web Storage...")
 				}
 			}
-        },
-        watch: {
-        	pp_PomainArray : function(val) {
-        		if (val != []) {
-        			this.isDisable = false;
-        		}else {
-        			this.isDisable = true;
-        		}
-        	}
-        },
-		
-
-    })
-
-
+		},
+		watch: {
+			pp_PomainArray : function(val) {
+				if (val != []) {
+					this.isDisable = false;
+				}else {
+					this.isDisable = true;
+				}
+			}
+		},
+	})
 </script>

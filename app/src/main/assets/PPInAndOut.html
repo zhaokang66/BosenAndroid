@@ -81,7 +81,8 @@
 					<tr>	
 						<th style="width:100px">选择</th>	
 						<th style="width:100px">ID</th>	
-						<th style="width:100px">生产订单号</	th>
+						<th style="width:100px">生产订单号</th>
+						<th style="width:100px">部门</th>
 						<th style="width:100px">单据日期</th	>
 						<th style="width:100px">备注</th>
 					</tr>
@@ -99,9 +100,10 @@
 				   border="1">
 				<tbody>
 					<tr v-for="pp_ProductPO in pp_ProductPOArray">
-						<td style="width:100px "  align="center" @click="checkboxClick"  class="inputTd"><input type="checkbox" v-model="pp_ProductPO.checked"  :id="pp_ProductPO.id"/></td>
+						<td style="width:100px "  align="center" @click="checkboxClick"  class="inputTd"><input type="checkbox" v-model="pp_ProductPO.checked"  :id="pp_ProductPO.id" :cDepName="pp_ProductPO.cDepName" :cMemo="pp_ProductPO.cMemo"/></td>
 						<td style="width:100px">{{pp_ProductPO.id}}</td>
 						<td style="width:100px">{{pp_ProductPO.cCode}}</td>
+						<td style="width:100px">{{pp_ProductPO.cDepName}}</td>
 						<td style="width:100px">{{pp_ProductPO.dDate}}</td>
 						<td style="width:100px">{{pp_ProductPO.cMemo}}</td>					
 					</tr>              
@@ -185,7 +187,9 @@ axios.defaults.timeout = 10000;
             pp_ProductPOArray:[],
             pp_PomainArray:[],			
 			minEndId:-1,
-			isDisable: true
+			isDisable: true,
+			cDepName: [],
+			poCMemo: ''
         },
         methods:{
 			selectPP_ProductPO:function(){
@@ -255,6 +259,19 @@ axios.defaults.timeout = 10000;
 				}
 				var ID=target.getAttribute("id");
 				if(target.checked){
+					if (this.cDepName.length == 0) {
+						this.cDepName.push(target.getAttribute("cDepName"));
+						this.poCMemo = target.getAttribute("cMemo");
+					} else {
+						this.cMemo = "";
+						if (this.cDepName.indexOf(target.getAttribute("cDepName")) == -1) {
+							target.checked = "";
+							alert("请选择相同部门！");
+							return;
+						} else {
+							this.cDepName.push(target.getAttribute("cDepName"));
+						}
+					}
 					var url = getUrl()+"listPP_Pomain?ID="+ID+"&bFinished=true&detailsFinshed=true";
 					axios.get(url).then(function(response) {
 					vue.$refs.topDiv2.scrollLeft=0;			        
@@ -263,14 +280,15 @@ axios.defaults.timeout = 10000;
 						jsonObject[each].checked="true";
 					}
 					vue.pp_PomainArray=vue.pp_PomainArray.concat(jsonObject);
-					console.log("dskofld")
 					console.log(vue.pp_PomainArray)
 					// vue.pp_PomainSelection=vue.pp_PomainSelection.concat(jsonObject);
 					}).catch(function (e) {
 						vue.$messagebox.alert(e, '错误');
 					});
 				}else{
-				
+					if (this.cDepName.length != 0) {
+						this.cDepName.splice(this.cDepName.length - 1, 1);
+					}
 					for(var i=0;i<this.pp_PomainArray.length;i++){
 						if(this.pp_PomainArray[i].id==ID){
 							this.pp_PomainArray.splice(i,1);

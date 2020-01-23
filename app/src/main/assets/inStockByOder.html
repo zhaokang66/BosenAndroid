@@ -56,7 +56,6 @@
 				<thead>
 					<tr>
 						<th style="width:100px">序号</th>
-						<th style="width:100px">选择</th>
 						<th style="width:100px">POID</th>
 						<th style="width:100px">id</th>
 						<th style="width:100px">仓库</th>
@@ -81,9 +80,6 @@
 				<tbody  id="list_info">
 					<tr v-for="(pO_PODetails,,index) in pO_PODetailsArray" class="red">
 						<td style="width:100px">{{index+1}}</td>
-						<td style="width:100px;text-align:center" >
-							<input type="checkbox" v-model="pO_PODetails.checked" :value="pO_PODetails.checked"/>
-						</td>
 						<td style="width:100px">{{pO_PODetails.pOID}}</td>
 						<td style="width:100px">{{pO_PODetails.id}}</td>
 						<td style="width:100px" align="center"  >
@@ -120,6 +116,7 @@
 <script src="./js/setting.js"></script>
 <script type="text/javascript">
 	var pO_PODetailsArray = JSON.parse(localStorage.getItem("pO_PODetailsArray"));
+	var temp = pO_PODetailsArray.slice();
 	for (var i = 0; i< pO_PODetailsArray.length; i++) {
 		pO_PODetailsArray[i].nowiReceivedQTY = 0;
 	}
@@ -173,10 +170,7 @@
 		    checkData: function(data) {
 		    	for (var i = 0; i< data.length; i++) {
 		    		var index = pO_PODetailsArray.indexOf(data[i])+1;
-		    		if (data[i].checked == false) {
-		    			data.splice(i, 1);
-		    			i--;
-		    		}else if (data[i].cWhCode ==null) {
+		    		if (data[i].cWhCode ==null) {
 		    			vue.$messagebox.alert("第"+index+"条订单的仓库不能为空！");
 		    			return false;
 		    		}else if (data[i].nowiReceivedQTY == 0) {
@@ -199,16 +193,20 @@
 		    	submitData = this.checkData(submitData);
 		    	if (!submitData) return;
 		    	if (submitData.length == 0) {
-		    		vue.$messagebox.alert("请勾选所属子项", "错误");
+		    		vue.$messagebox.alert("数据为空，请填写！", "错误");
 		    		return;
 		    	};
-		    	var url = "http://192.168.1.104:8082/submitPO_Podetails";
+		    	var url = getUrl()+"submitPO_Podetails";
 		    	axios.post(url,pO_PODetailsArray)
 		    	.then(function(response){
-		    		vue.$messagebox.alert(response.data);
+		    		vue.$messagebox.alert(response.data);	
+		    		setTimeout(function() {
+		    			makeJava.jumpHtml("file:///android_asset/index.html");	
+		    		},3000);	    			    		
+		    		
 		    	})
 		    	.catch(function(e){
-		    		vue.$messagebox.alert(e, '错误');
+		    		vue.$messagebox.alert(e, '错误');		    		
 		    	});
 		    },
 		},
@@ -229,7 +227,7 @@
 		   		}
 	    	})
 	    	.catch(function(e){
-		    	// vue.$messagebox.alert(e, '错误');
+		    	vue.$messagebox.alert(e, '错误');
 		    });
 		},
 		mounted: function(){
