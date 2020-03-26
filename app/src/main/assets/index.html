@@ -100,20 +100,20 @@ table{
 
 		<div class="inStock">
 			<p>入库</p>
-			<button class="navButton" @click="jumpUrl('orderSelect')">采购入库</button>
-			<button class="navButton" @click="jumpUrl('PoInAndOut')">采购入库退库</button>
-			<button class="navButton" @click="jumpUrl('pp_ProductPO')">产成品入库</button>
-			<button class="navButton" @click="jumpUrl('PPInAndOut')">产成品入库退库</button>
-			<button class="navButton" @click="jumpUrl('otherIn')">其他入库</button>
-			<button class="navButton" @click="jumpUrl('otherInAndOut')">其他入库退库</button>
+			<button class="navButton" @click="jumpUrl('purchaseStorage')">采购入库</button>
+			<button class="navButton" @click="jumpUrl('purchaseStorageAndReturn')">采购入库退库</button>
+			<button class="navButton" @click="jumpUrl('productStorage')">产成品入库</button>
+			<button class="navButton" @click="jumpUrl('productStorageAndReturn')">产成品入库退库</button>
+			<button class="navButton" @click="jumpUrl('otherStorage')">其他入库</button>
+			<button class="navButton" @click="jumpUrl('otherStorageAndReturn')">其他入库退库</button>
 		</div>
 
 		<div class="outStock">
 			<p>出库</p>
-			<button class="navButton" @click="jumpUrl('PPOut')">材料出库</button>
-			<button class="navButton" @click="jumpUrl('PPOutAndIn')">材料出库退库</button>
-			<button class="navButton" @click="jumpUrl('otherOut')">其他出库</button>
-			<button class="navButton" @click="jumpUrl('otherOutAndOut')">其他出库退库</button>
+			<button class="navButton" @click="jumpUrl('materialDelivery')">材料出库</button>
+			<button class="navButton" @click="jumpUrl('materialDeliveryAndReturn')">材料出库退库</button>
+			<button class="navButton" @click="jumpUrl('otherDelivery')">其他出库</button>
+			<button class="navButton" @click="jumpUrl('otherDeliveryAndReturn')">其他出库退库</button>
 
 		</div>
 		
@@ -263,7 +263,7 @@ var taskswiper = {
 			},
 			add: function () {
 				
-				var url = getUrl()+"addSignature"
+				var url = getUrl()+"addSignature/"
 				
 				var data = $("#signature").jSignature("getData", "svgbase64");
 				
@@ -272,10 +272,11 @@ var taskswiper = {
 					//alert(testURl)
 					console.log("data:"+data.join(","))
 					console.log(data[1])
-
 					axios.post(url,"base64Str="+encodeURIComponent(data[1])).then(function(response){                       
 						alert("成功")
-					})     
+					}).catch(function(e){
+						console.log(e)
+					})   
 				},       
 				
 				

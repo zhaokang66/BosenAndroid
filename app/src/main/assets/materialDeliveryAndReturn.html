@@ -195,7 +195,7 @@ axios.defaults.timeout = 10000;
         },
         methods:{
 			selectPP_ProductPO:function(){
-				var url = getUrl()+"listPP_ProductPO?bFinished=true&endId=-1&detailsFinshed=false"
+				var url = getUrl()+"listPP_ProductPO?bFinished=true&endId=-1"
 				this.pp_ProductPOArray=[]
 				this.pp_PomainArray=[]
 				this.doLoadMore(url)
@@ -205,7 +205,7 @@ axios.defaults.timeout = 10000;
 				this.loading = true;
 				if(this.minEndId!=-1){
 					//alert(this.minEndId);
-					var url = getUrl()+"listPP_ProductPO?bFinished=true&detailsFinshed=false&endId="+this.minEndId;
+					var url = getUrl()+"listPP_ProductPO?bFinished=true&endId="+this.minEndId;
 					this.doLoadMore(url)
 					
 				}
@@ -268,11 +268,9 @@ axios.defaults.timeout = 10000;
 							vue.$messagebox.alert("请选择相同部门的生产订单!", '错误');
 							target.checked="";
 							return;
-						}else {
-							this.cDepName.push(target.getAttribute("cDepName"));
 						}
 					}
-					var url=getUrl()+"listPP_Pomain?ID="+ID+"&bFinished=true&detailsFinshed=false";
+					var url=getUrl()+"listPP_Pomain?ID="+ID+"&bFinished=true";
 					axios.get(url).then(function(response) {
 						vue.$refs.topDiv2.scrollLeft=0;			        
 						var jsonObject = response.data;						
@@ -299,7 +297,6 @@ axios.defaults.timeout = 10000;
 				}
 			},
 			jumpOderInstock:function(){
-				window.localStorage.clear();
 				var that = this;
 		    	this.isDisable = true;
 		    	var submitData = this.pp_PodetailsArray.slice();
@@ -322,17 +319,16 @@ axios.defaults.timeout = 10000;
 					vue.$messagebox.alert("请选择所属子项！", '错误');
 					return;
 				}
-
 				if (typeof(Storage) !== "undefined") {
 					localStorage.setItem("pp_PodetailsArray",JSON.stringify(submitData));
-					makeJava.jumpHtml("file:///android_asset/ppInStockByOder.html");				
+					makeJava.jumpHtml("file:///android_asset/materialOutStockByOrder.html");				
 				} else {
     				alert("Sorry, your browser does not support Web Storage...")
 				}
 			
 			},
 			selectPP_Podetails: function(mainId) {	
-				var url = getUrl()+"listPP_Podetails?mainId="+mainId+"&detailsFinshed=false";	
+				var url = getUrl()+"listPP_Podetails?mainId="+mainId;	
 				axios.get(url).then(function(response){
 					var jsonObject = response.data;
 						for(each in jsonObject) {

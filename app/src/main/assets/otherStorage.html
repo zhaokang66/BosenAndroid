@@ -499,6 +499,7 @@ th, td{
 			.catch(function(e){
 				vue.$messagebox.alert(e, '错误');
 			});
+			
 			axios.get(getUrl()+"getRdStyleList?bRdFlag=1")
 			.then(function(response){
 				var cRdStyleList = response.data;

@@ -255,7 +255,6 @@ var vue=new Vue({
 			checkboxClick:function(e){
 
 				var target = e.target;
-				console.log(target)
 
 				if (target.getAttribute("class")  == "inputTd") {
 					target = target.firstChild;
@@ -307,11 +306,18 @@ var vue=new Vue({
 			},
 			jumpOderInstock:function(){	
 				window.localStorage.clear();
-				console.log(this.pp_PomainArray)
+				var submitData = vue.pp_PomainArray.slice();
+				for (var i = 0; i < submitData.length; i++) {
+					if (!submitData[i].checked) {
+						submitData.splice(i, 1);
+						i--;
+					}
+				}
+				console.log(submitData)
 				if (typeof(Storage) !== "undefined") {
-					localStorage.setItem("pp_PomainArray", JSON.stringify(this.pp_PomainArray));
+					localStorage.setItem("pp_PomainArray", JSON.stringify(submitData));
 					localStorage.setItem("poCMemo", JSON.stringify(this.poCMemo));
-					makeJava.jumpHtml("file:///android_asset/ppInStockByOder.html");
+					makeJava.jumpHtml("file:///android_asset/productInStockByOrder.html");
 				} else {
 					alert("Sorry, your browser does not support Web Storage...")
 				}

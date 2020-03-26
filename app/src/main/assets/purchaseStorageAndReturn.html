@@ -298,7 +298,7 @@ var vue=new Vue({
 			if (typeof(Storage) !== "undefined") {
 				this.pO_PODetailsArray = 
 				localStorage.setItem("pO_PODetailsArray", JSON.stringify(this.pO_PODetailsArray))
-				makeJava.jumpHtml("file:///android_asset/inStockByOder.html");				
+				makeJava.jumpHtml("file:///android_asset/purchaseInStockByOrder.html");				
 			} else {
 				vue.$messagebox.alert("Sorry, your browser does not support Web Storage...");
 			}
