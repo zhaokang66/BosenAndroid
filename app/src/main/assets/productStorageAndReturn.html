@@ -70,7 +70,7 @@
 	<div>
 		<input type="text" placeholder="请输入采购订单号" class="condition"/>
 		<input type="text" placeholder="请输入供应商名称" class="condition"/>
-		<mt-button size="small" type="primary" @click.native="selectPP_ProductPO">查询</mt-button>
+		<mt-button size="small" type="primary" @click.native="selectPP_ProductPO" :disabled="isDisable">查询</mt-button>
 	</div>
 	
 	<div style="border:1px solid black">
@@ -160,7 +160,7 @@
 			</table>
 		</div>
 	</div>	
-	<mt-button size="small" type="primary" @click.native="jumpOderInstock" style="float:right" :disabled="isDisable">确定</mt-button>
+	<mt-button size="small" type="primary" @click.native="jumpOderInstock" style="float:right" >确定</mt-button>
 	<mt-button size="small" type="primary" style="float:right">取消</mt-button>
 
 </div>
@@ -187,12 +187,17 @@ axios.defaults.timeout = 10000;
             pp_ProductPOArray:[],
             pp_PomainArray:[],			
 			minEndId:-1,
-			isDisable: true,
 			cDepName: [],
-			poCMemo: ''
+			poCMemo: '',
+			isDisable: false
         },
         methods:{
 			selectPP_ProductPO:function(){
+				var that = this;
+				this.isDisable = true;
+				setTimeout(function() {
+					that.isDisable = false;
+				},1000);
 				var url = getUrl()+"listPP_ProductPO?bFinished=true&endId=-1&detailsFinshed=true"
 				this.pp_ProductPOArray=[]
 				this.pp_PomainArray=[]
@@ -299,10 +304,20 @@ axios.defaults.timeout = 10000;
 			},
 			jumpOderInstock:function(){	
 				window.localStorage.clear();
-
+				var submitData = vue.pp_PomainArray.slice();
+				for (var i = 0; i < submitData.length; i++) {
+					if (!submitData[i].checked) {
+						submitData.splice(i, 1);
+						i--;
+					}
+				}
+				if (submitData.length == 0) {
+					vue.$messagebox.alert("请选择所属子项！", '错误');
+					return;
+				}
 				if (typeof(Storage) !== "undefined") {
-					this.pp_PomainArray = 
-					localStorage.setItem("pp_PomainArray", JSON.stringify(this.pp_PomainArray))
+					localStorage.setItem("poCMemo",JSON.stringify(this.poCMemo));
+					localStorage.setItem("pp_PomainArray", JSON.stringify(submitData))
 					makeJava.jumpHtml("file:///android_asset/productInStockByOrder.html")
 
     
@@ -310,17 +325,7 @@ axios.defaults.timeout = 10000;
     				alert("Sorry, your browser does not support Web Storage...")
 				}
 			}
-        },
-        watch: {
-        	pp_PomainArray : function(val) {
-        		if (val != []) {
-        			this.isDisable = false;
-        		}else {
-        			this.isDisable = true;
-        		}
-        	}
-        },
-		
+        }
 
     })
 

@@ -196,9 +196,7 @@
 		    	}
 		    },
 		    submitpp_Pomain: function() {
-		    	var that = this;
 		    	var submitData = this.pp_PomainArray.slice();
-		    	this.isDisable = true;
 		    	setTimeout(function(){
 		    		that.isDisable = false;
 		    	},1000);
@@ -211,10 +209,8 @@
 		    	var url = getUrl()+"submitpp_Pomain";
 		    	axios.post(url,submitData)
 		    	.then(function(response){
-		    		vue.$messagebox.alert(response.data);
-		    		setTimeout(function() {
-		    			makeJava.jumpHtml("file:///android_asset/index.html");	
-		    		},3000);	    			    
+			    	localStorage.setItem("messageInfo",response.data);
+			    	makeJava.jumpHtml("file:///android_asset/index.html");	
 		    	})
 		    	.catch(function(e){
 		    		vue.$messagebox.alert(e, '错误');
@@ -225,7 +221,7 @@
 		    	var a = this.pp_PomainArray[index].nowiReceivedQTY;
 		    	var b = this.pp_PomainArray[index].iUnitCost;
 		    	a = a * 1;
-		    	this.pp_PomainArray[index].iPrice = a * b;
+		    	this.otherInRdrecord[index].iPrice = (a * b).toFixed(2);
 		    },
 		    //检查数据
 		    checkData: function(data) {

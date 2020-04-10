@@ -198,12 +198,9 @@
 		    	};
 		    	var url = getUrl()+"submitPO_Podetails";
 		    	axios.post(url,pO_PODetailsArray)
-		    	.then(function(response){
-		    		vue.$messagebox.alert(response.data);	
-		    		setTimeout(function() {
-		    			makeJava.jumpHtml("file:///android_asset/index.html");	
-		    		},3000);	    			    		
-		    		
+		    	.then(function(response){	
+		    		localStorage.setItem("messageInfo",response.data);
+		    		makeJava.jumpHtml("file:///android_asset/index.html");	
 		    	})
 		    	.catch(function(e){
 		    		vue.$messagebox.alert(e, '错误');		    		

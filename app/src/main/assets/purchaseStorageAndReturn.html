@@ -289,19 +289,25 @@ var vue=new Vue({
 			}
 		},
 		jumpOderInstock:function(){	
-			if (this.pO_PODetailsArray.length == 0) {
-				vue.$messagebox.alert("请选择所属子项！", '错误');
-				return;
-			}
-			window.localStorage.clear();
-
-			if (typeof(Storage) !== "undefined") {
-				this.pO_PODetailsArray = 
-				localStorage.setItem("pO_PODetailsArray", JSON.stringify(this.pO_PODetailsArray))
-				makeJava.jumpHtml("file:///android_asset/purchaseInStockByOrder.html");				
-			} else {
-				vue.$messagebox.alert("Sorry, your browser does not support Web Storage...");
-			}
+				window.localStorage.clear();
+				var submitData = vue.pO_PODetailsArray.slice();
+				for (var i = 0; i < submitData.length; i++) {
+					if (!submitData[i].checked) {
+						submitData.splice(i, 1);
+						i--;
+					}
+				}
+				if (submitData.length == 0) {
+					vue.$messagebox.alert("请选择所属子项！", '错误');
+					return;
+				}
+				console.log(submitData);
+				if (typeof(Storage) !== "undefined") {
+					localStorage.setItem("pO_PODetailsArray", JSON.stringify(submitData))
+					makeJava.jumpHtml("file:///android_asset/purchaseInStockByOrder.html")
+				} else {
+    				alert("Sorry, your browser does not support Web Storage...")
+				}
 		}
 
 	},

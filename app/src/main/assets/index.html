@@ -4,7 +4,12 @@
 	<meta charset="UTF-8">
 	<!-- 引入样式 -->
 	<link rel="stylesheet" href="./css/mint/style.min.css">
-	
+	<script type="text/javascript">
+		if (localStorage.getItem("messageInfo") != null) {
+			alert(localStorage.getItem("messageInfo"));
+			window.localStorage.clear();
+		}
+	</script>
 
 </head>
 <style>
@@ -24,6 +29,17 @@ table{
 	font-size: 14px;
 	outline: none;
 	margin: 4px 5px;
+}
+.replacePro{
+	width: 300px;
+	margin: 5px auto;
+	height: 40px;
+	display: block;
+	background-color: #26a2ff;
+	outline: none;
+	border-radius: 11px;
+	border: 0;
+	color: white;
 }
 .navButton:active {
 	opacity: 0.5;
@@ -111,11 +127,13 @@ table{
 		<div class="outStock">
 			<p>出库</p>
 			<button class="navButton" @click="jumpUrl('materialDelivery')">材料出库</button>
-			<button class="navButton" @click="jumpUrl('materialDeliveryAndReturn')">材料出库退库</button>
+			<button class="navButton" @click="jumpUrl('materialDeliveryAndReturn')">材料出库退库</button>	
 			<button class="navButton" @click="jumpUrl('otherDelivery')">其他出库</button>
 			<button class="navButton" @click="jumpUrl('otherDeliveryAndReturn')">其他出库退库</button>
 
 		</div>
+
+		<button class="replacePro">替换生产编号</button>
 		
 		<div id="signature" style="border:1px dotted black"></div>
 		<div style="border:1px solid black">
@@ -146,7 +164,6 @@ table{
 	<script src="https://cdn.bootcss.com/qs/6.5.1/qs.min.js"></script>
 	<script src="./js/setting.js"></script>
 	<script>
-
 		$(document).ready(function() {
 			$("#signature").jSignature()
 		})
@@ -263,7 +280,7 @@ var taskswiper = {
 			},
 			add: function () {
 				
-				var url = getUrl()+"addSignature/"
+				var url = getUrl()+"addSignature/";
 				
 				var data = $("#signature").jSignature("getData", "svgbase64");
 				

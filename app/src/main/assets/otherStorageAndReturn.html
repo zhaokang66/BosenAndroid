@@ -43,6 +43,7 @@ th, td{
 	height: 520px;
 	float: left;
 	text-align: center;
+	width: 200px;
 }
 .eachInventoy{
 	cursor: pointer;
@@ -198,8 +199,8 @@ th, td{
 						</ul>
 					</div>
 
-					<div class="inventoryList" style="width: 180px;">
-					<div style="width:180px;overflow:scroll;" @scroll="topScrollEvent" ref="topDiv" id="topDiv">
+					<div class="inventoryList" >
+					<div style="overflow:scroll;" @scroll="topScrollEvent" ref="topDiv" id="topDiv">
 						<table width="500" border="1" style="border-collapse:collapse;"align="center">
 							<thead>
 								<tr>
@@ -212,7 +213,7 @@ th, td{
 							</table>
 						</div>
 
-						<div style="width:180px;height:1006px;overflow:scroll"  ref="downDiv" @scroll="downScrollEvent" id="downDiv" >
+						<div style="height:1006px;overflow:scroll"  ref="downDiv" @scroll="downScrollEvent" id="downDiv" >
 							<table width="500" border="1" style="border-collapse:collapse" v-infinite-scroll="loadMore"
 							infinite-scroll-disabled="loading"
 							infinite-scroll-distance="10">
@@ -243,6 +244,7 @@ th, td{
 <script src="./js/vue/axios.min.js"></script>
 <script src="./js/setting.js"></script>
 <script>
+
 
 	function chevron_toggle(){
 		$("#collapseParent").find("span").toggleClass("glyphicon-chevron-up");
@@ -285,24 +287,32 @@ th, td{
 				target.style.backgroundColor = "white";
 			},
 			addData: function(e) {
-				var target = e.currentTarget.children;				
-				var cInvCode = target[0].getAttribute("cInvCode");
-				var cVenCode = target[0].getAttribute("cVenCode");
-				var cInvName = target[2].getAttribute("cInvName");
-				var cInvStd = target[3].getAttribute("cInvStd");
-				var cComunitName = target[4].getAttribute("cComunitName");
-				//addNnubmber =maxIdex maxIndex +10
-				vue.otherInRdrecord[vue.addNumber].cInvCode = cInvCode;
-				vue.otherInRdrecord[vue.addNumber].cVenCode = cVenCode;
-				vue.otherInRdrecord[vue.addNumber].cInvName = cInvName;
-				vue.otherInRdrecord[vue.addNumber].cInvStd = cInvStd;
-				vue.otherInRdrecord[vue.addNumber].cComunitName = cComunitName;
+				var target = e.currentTarget.children;	
+				var cIncData = [];
+				cIncData.push(
+					{
+						"cInvCode":target[0].getAttribute("cInvCode"),
+						"cVenCode":target[0].getAttribute("cVenCode"),
+						"cInvName":target[2].getAttribute("cInvName"),
+						"cInvStd":target[3].getAttribute("cInvStd"),
+						"cComunitName":target[4].getAttribute("cComunitName")
+					}
+				);
+				vue.setInventory(cIncData[0]);
 				if (vue.addNumber == vue.maxLine - 1) {
 					vue.maxLine += 10;
 				}
 				console.log(vue.otherInRdrecord)
 
 				$('#inventoryInfo').modal('hide');
+			},
+			setInventory: function(data) {
+				console.log(data)
+				vue.otherInRdrecord[vue.addNumber].cInvCode = data.cInvCode;
+				vue.otherInRdrecord[vue.addNumber].cVenCode = data.cVenCode;
+				vue.otherInRdrecord[vue.addNumber].cInvName = data.cInvName;
+				vue.otherInRdrecord[vue.addNumber].cInvStd = data.cInvStd;
+				vue.otherInRdrecord[vue.addNumber].cComunitName = data.cComunitName;
 			},
 			setFlag: function(index) {
 				console.log(vue.otherInRdrecord)
@@ -320,24 +330,22 @@ th, td{
 				var res = true;
 				var cInvCode =vue.otherInRdrecord[index].cInvCode;
 				console.log(cInvCode)
+				if (cInvCode == "") {
+					vue.setInventory([]);
+					return;
+				}
 				//这里检验cInvCode 是否合法如果合法，则返回相应的其他字段信息，并且赋值给vue.otherInRdrecord[index]
 				var url = getUrl() + "selectInventory?cInvCode=" + cInvCode;
 				axios.get(url).then(function(response){
 					var jsonObject = response.data;
 					console.log(jsonObject)
 					if (jsonObject.length == 0) {
-						vue.otherInRdrecord[index].cInvCode = "";
-						vue.otherInRdrecord[index].cInvStd = "";
-						vue.otherInRdrecord[index].cInvName = "";
-						vue.otherInRdrecord[index].cComunitName = "";
+						vue.setInventory([]);
 						res = false;
 						vue.$messagebox.alert("没有这个存货编码，请重新输入！","错误");
 						return;
 					} else {
-						vue.otherInRdrecord[index].cInvStd = jsonObject.cInvStd;
-						vue.otherInRdrecord[index].cInvName = jsonObject.cInvName;
-						vue.otherInRdrecord[index].cComunitName = jsonObject.computationUnit.cComunitName;
-						vue.otherInRdrecord[index].cVenCode = jsonObject.cVenCode;
+						vue.setInventory(jsonObject);
 						if (index == vue.maxLine - 1) {
 							vue.maxLine += 10;
 						}
@@ -391,9 +399,7 @@ th, td{
 		    		vue.$messagebox.alert("请先选择仓库！","错误");
 		    		return;
 		    	}
-		    	alert("赋值前："+vue.limit)
 		    	vue.limit = 50;
-		    	alert("赋值后"+vue.limit)
 		    	vue.cInvCCode = cInvCCode;
 		    	$('#inventoryInfo').modal('show');
 		    	vue.inventoryArray = [];
@@ -426,7 +432,8 @@ th, td{
 		    	var url = getUrl()+"submitotherInRrecord";
 		    	axios.post(url,submitData)
 		    	.then(function(response){
-		    		vue.$messagebox.alert(response.data);
+		    		localStorage.setItem("messageInfo",response.data);
+		    		makeJava.jumpHtml("file:///android_asset/index.html");	
 		    	})
 		    	.catch(function(e){
 		    		vue.$messagebox.alert(e, '错误');
@@ -436,9 +443,14 @@ th, td{
 		    sumPrice: function(index) {
 		    	if (!this.cInvCodeIsExists(index)) return;
 		    	var a = this.otherInRdrecord[index].fQuantity;
+		    	if (a >0) {
+			   		this.otherInRdrecord[index].fQuantity = 0;
+			   		vue.$messagebox.alert("数量不能大于0", '错误');
+			   		return;
+			    }
 		    	var b = this.otherInRdrecord[index].iUnitCost;
 		    	a = a * 1;
-		    	this.otherInRdrecord[index].iPrice = a * b;
+		    	this.otherInRdrecord[index].iPrice = (a * b).toFixed(2);
 		    },
 		    cInvCodeIsExists: function(index) {
 		    	if (this.otherInRdrecord[index].cInvCode == "") {
@@ -461,8 +473,8 @@ th, td{
 		    			data.splice(i,1);
 		    			i--;
 		    		}else {
-		    			if (data[i].fQuantity <= 0) {
-		    				vue.$messagebox.alert("第"+(i+1)+"条数据入库数量不能小于等于0！", '错误');
+		    			if (data[i].fQuantity >= 0) {
+		    				vue.$messagebox.alert("第"+(i+1)+"条数据入库数量不能大于等于0！", '错误');
 		    				return;
 		    			}else {
 		    				data[i].cWhCode = vue.chooseWharehouse;

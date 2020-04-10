@@ -70,7 +70,7 @@ div::-webkit-scrollbar {
 		<div>
 			<input type="text" placeholder="请输入采购订单号" class="condition"/>
 			<input type="text" placeholder="请输入供应商名称" class="condition"/>
-			<mt-button size="small" type="primary" @click.native="selectPP_ProductPO">查询</mt-button>
+			<mt-button size="small" type="primary" @click.native="selectPP_ProductPO" :disabled="isDisable">查询</mt-button>
 		</div>
 
 		<div style="border:1px solid black">
@@ -166,7 +166,7 @@ div::-webkit-scrollbar {
 			</table>
 		</div>
 	</div>	
-	<mt-button size="small" type="primary" @click.native="jumpOderInstock" style="float:right" :disabled="isDisable">确定</mt-button>
+	<mt-button size="small" type="primary" @click.native="jumpOderInstock" style="float:right" >确定</mt-button>
 	<mt-button size="small" type="primary" style="float:right">取消</mt-button>
 
 </div>
@@ -193,12 +193,17 @@ var vue=new Vue({
 		pp_ProductPOArray:[],
 		pp_PomainArray:[],			
 		minEndId:-1,
-		isDisable: true,
 		cDepName: [],
-		poCMemo: ''
+		poCMemo: '',
+		isDisable: false
 	},
 	methods:{
 		selectPP_ProductPO:function(){
+			var that = this;
+			this.isDisable = true;
+			setTimeout(function() {
+				that.isDisable = false;
+			},1000);
 			var url = getUrl()+"listPP_ProductPO?bFinished=false&endId=-1&detailsFinshed=true"
 			this.pp_ProductPOArray=[]
 			this.pp_PomainArray=[]
@@ -313,6 +318,10 @@ var vue=new Vue({
 						i--;
 					}
 				}
+				if (submitData.length == 0) {
+					vue.$messagebox.alert("请选择所属子项！", '错误');
+					return;
+				}
 				console.log(submitData)
 				if (typeof(Storage) !== "undefined") {
 					localStorage.setItem("pp_PomainArray", JSON.stringify(submitData));
@@ -322,15 +331,6 @@ var vue=new Vue({
 					alert("Sorry, your browser does not support Web Storage...")
 				}
 			}
-		},
-		watch: {
-			pp_PomainArray : function(val) {
-				if (val != []) {
-					this.isDisable = false;
-				}else {
-					this.isDisable = true;
-				}
-			}
-		},
+		}
 	})
 </script>
