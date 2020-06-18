@@ -22,6 +22,21 @@ import com.honeywell.aidc.BarcodeReadEvent;
 import com.honeywell.aidc.BarcodeReader;
 import com.honeywell.aidc.TriggerStateChangeEvent;
 
+
+import android.content.Context;
+import android.media.AudioManager;
+import android.media.SoundPool;
+import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.Toast;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -36,12 +51,20 @@ public class MainActivity extends AppCompatActivity  implements BarcodeReader.Tr
 
     public WebView webView;
     public boolean mLoadFinished = false;
+    private SoundPool soundPool;
+    private int sucessSoundId;
+    private int failSoundId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+        soundPool = new SoundPool(5, AudioManager.STREAM_ALARM, 5);
+        sucessSoundId = soundPool.load(this, R.raw.sucess, Integer.MAX_VALUE);
+
+                failSoundId = soundPool.load(this, R.raw.fail, Integer.MAX_VALUE);
 
         webView = (WebView) findViewById(R.id.wv);
         WebSettings webSettings = webView.getSettings();
@@ -189,6 +212,13 @@ public class MainActivity extends AppCompatActivity  implements BarcodeReader.Tr
         if (manager != null) {
             manager.close();
         }
+    }
+
+    public void makeSuccessSound(){
+        soundPool.play(sucessSoundId, 0.8f, 0.8f, 1, 0, 1);
+    }
+    public void makeFailSound(){
+        soundPool.play(failSoundId, 0.8f, 0.8f, 1, 0, 1);
     }
 
 

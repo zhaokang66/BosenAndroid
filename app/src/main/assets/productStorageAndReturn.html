@@ -270,9 +270,9 @@ axios.defaults.timeout = 10000;
 					} else {
 						this.cMemo = "";
 						if (this.cDepName.indexOf(target.getAttribute("cDepName")) == -1) {
-							target.checked = "";
-							alert("请选择相同部门！");
-							return;
+							// target.checked = "";
+							// alert("请选择相同部门！");
+							// return;
 						} else {
 							this.cDepName.push(target.getAttribute("cDepName"));
 						}

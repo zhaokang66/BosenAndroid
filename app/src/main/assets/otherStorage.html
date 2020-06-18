@@ -43,7 +43,7 @@
 		height: 520px;
 		float: left;
 		text-align: center;
-		width: 200px;
+		width: 180px;
 	}
 	.eachInventoy{
 		cursor: pointer;
@@ -351,13 +351,15 @@
 						if (jsonObject.length == 0) {
 							vue.setInventory([]);
 							res = false;
+							vue.otherInRdrecord[index].cInvCode = "";
 							vue.$messagebox.alert("没有这个存货编码，请重新输入！","错误");
-							return;
 						} else {
+							vue.setFlag(index);
 							vue.setInventory(jsonObject);
 							if (index == vue.maxLine - 1) {
 								vue.maxLine += 10;
 							}
+
 						}
 					})
 					.catch(function(e){
@@ -389,8 +391,10 @@
 			    		}
 			    		vue.otherInRdrecord[emptyStart].cInvCode = val;
 			    		vue.otherInRdrecord[emptyStart].fQuantity = (this.checkCInvCode(emptyStart)) ? vue.otherInRdrecord[emptyStart].fQuantity + 1 : vue.otherInRdrecord[emptyStart].fQuantity;
+			    		vue.sumPrice(emptyStart);
 			    	} else if (temp.length == 1) {
 			    		vue.otherInRdrecord[temp[0] - 1].fQuantity++;
+			    		vue.sumPrice(temp[0] - 1);
 			    	} else {
 			    		vue.$messagebox.alert("记录中有至少两条相同的存货编码，请在第"+temp.join(", ")+"行手动输入入库数量！");
 			    	}
@@ -443,10 +447,12 @@
 			    	axios.post(url,submitData)
 			    	.then(function(response){
 			    		localStorage.setItem("messageInfo",response.data);
+		    			makeJava.makeSuccessSound();
 		    			makeJava.jumpHtml("file:///android_asset/index.html");	
 			    	})
 			    	.catch(function(e){
-			    		vue.$messagebox.alert(e, '错误');
+			    		makeJava.makeFailSound();
+		    			vue.$messagebox.alert(e, '错误');
 			    	});
 			    },
 			    //计算金额
@@ -478,8 +484,16 @@
 			    		vue.$messagebox.alert("表体没有数据，请输入！", '错误');
 			    		return false;
 			    	}
+			    	if (this.chooseCRdCode == '') {
+			    		vue.$messagebox.alert("入库类别不能为空！", '错误');
+			    		return false;
+			    	}
+			    	if (this.choosecDepCode == '') {
+			    		vue.$messagebox.alert("部门不能为空！", '错误');
+			    		return false;
+			    	}
 			    	for (var i = 0; i < data.length; i++) {
-			    		if (data[i].cInvCode == "") {
+			    		if (data[i].cInvCode == "" || data[i].cInvCode == undefined) {
 			    			data.splice(i,1);
 			    			i--;
 			    		}else {

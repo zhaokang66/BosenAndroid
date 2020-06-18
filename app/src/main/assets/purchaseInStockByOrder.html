@@ -168,17 +168,20 @@
 		    	}
 		    },
 		    checkData: function(data) {
-		    	for (var i = 0; i< data.length; i++) {
+		    	for (var i =0; i < data.length; i++) {
 		    		var index = pO_PODetailsArray.indexOf(data[i])+1;
-		    		if (data[i].cWhCode ==null) {
-		    			vue.$messagebox.alert("第"+index+"条订单的仓库不能为空！");
-		    			return false;
-		    		}else if (data[i].nowiReceivedQTY == 0) {
-		    			vue.$messagebox.alert("第"+index+"条订单的本次入库数量不能为空！");
-		    			return false;
-		    		}else if (data[i].nowiReceivedQTY > (data[i].iQuantity - data[i].iReceivedQTY)) {
-		    			vue.$messagebox.alert("第"+index+"条订单的本次入库数量不能大于入库上限范围！");
-		    			return false;
+		    		if (data[i].nowiReceivedQTY == 0) {
+		    			data.splice(i,1);
+		    			i--;
+		    		}else{
+		    			if (data[i].cWhCode == null) {
+		    				vue.$messagebox.alert("第"+index+"条数据的仓库不能为空！","错误");
+		    				return false;
+		    			}
+		    			if (data[i].nowiReceivedQTY > (data[i].iQuantity -data[i].iReceivedQTY)) {
+		    				vue.$messagebox.alert("本次入库数量不能大于入库上限！","错误");
+		    				return false;
+		    			}
 		    		}
 		    	}
 		    	return data;
@@ -196,13 +199,16 @@
 		    		vue.$messagebox.alert("数据为空，请填写！", "错误");
 		    		return;
 		    	};
+		    	console.log(submitData);
 		    	var url = getUrl()+"submitPO_Podetails";
-		    	axios.post(url,pO_PODetailsArray)
+		    	axios.post(url,submitData)
 		    	.then(function(response){	
 		    		localStorage.setItem("messageInfo",response.data);
+		    		makeJava.makeSuccessSound();
 		    		makeJava.jumpHtml("file:///android_asset/index.html");	
 		    	})
 		    	.catch(function(e){
+		    		makeJava.makeFailSound();
 		    		vue.$messagebox.alert(e, '错误');		    		
 		    	});
 		    },

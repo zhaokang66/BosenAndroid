@@ -85,9 +85,6 @@
 				<tbody  id="list_info">
 					<tr v-for="(pp_Podetails,index) in pp_PodetailsArray" class="red">
 						<td style="width:100px">{{index+1}}</td>
-						<td style="width:100px;text-align:center" >
-							<input type="checkbox" v-model="pp_Podetails.checked" :value="pp_Podetails.checked"/>
-						</td>
 						<td style="width:100px">{{pp_Podetails.subId}}</td>
 						<td style="width:100px">{{pp_Podetails.mainId}}</td>
 						<td style="width:100px">
@@ -202,15 +199,18 @@
 		    	submitData = this.checkData(submitData);
 		    	if(!submitData) return;
 		    	if (submitData.length == 0) {
-		    		vue.$messagebox.alert("请勾选所属子项", "错误");
+		    		vue.$messagebox.alert("数据不能为空！", "错误");
 		    		return;
 		    	};
 		    	var url = getUrl()+"submitpp_Podetails";
 		    	axios.post(url,submitData)
 		    	.then(function(response){
-		    		vue.$messagebox.alert(response.data);
+		    		localStorage.setItem("messageInfo",response.data);
+		    		makeJava.makeSuccessSound();
+		    		makeJava.jumpHtml("file:///android_asset/index.html");	
 		    	})
 		    	.catch(function(e){
+		    		makeJava.makeFailSound();
 		    		vue.$messagebox.alert(e, '错误');
 		    	});
 		    },
@@ -234,13 +234,9 @@
 
 		    	for (var i = 0; i < data.length; i++) {
 		    		var index = this.pp_PodetailsArray.indexOf(data[i])+1;
-		    		if (data[i].checked == false) {
+		    		if (data[i].nowfOutQuantity == 0) {
 		    			data.splice(i, 1);
 		    			i--;
-		    		}else if (data[i].nowfOutQuantity == 0){
-		    			
-		    			vue.$messagebox.alert("第"+index+"条订单的本次入库数量不能为空！");
-		    			return false;
 		    		}else if (data[i].nowfOutQuantity > (data[i].fQuantity - data[i].fOutQuantity)) {
 		    			vue.$messagebox.alert("第"+index+"条订单的本次出库数量不能大于出库上限范围！");
 		    			return false;
@@ -272,7 +268,7 @@
 		    	vue.$messagebox.alert(e, '错误');
 		    });
 
-		    axios.get(getUrl()+"getRdStyleList")
+		    axios.get(getUrl()+"getRdStyleList?bRdFlag=0")
 		   	.then(function(response){
 		   		var cRdStyleList = response.data;
 	   			for (var i in cRdStyleList) {

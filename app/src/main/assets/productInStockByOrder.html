@@ -203,16 +203,18 @@
 		    	submitData = this.checkData(submitData);
 		    	if(!submitData) return;
 		    	if (submitData.length == 0) {
-		    		vue.$messagebox.alert("请勾选所属子项", "错误");
+		    		vue.$messagebox.alert("数据不能为空！", "错误");
 		    		return;
 		    	};
 		    	var url = getUrl()+"submitpp_Pomain";
 		    	axios.post(url,submitData)
 		    	.then(function(response){
+		    		makeJava.makeSuccessSound();
 			    	localStorage.setItem("messageInfo",response.data);
 			    	makeJava.jumpHtml("file:///android_asset/index.html");	
 		    	})
 		    	.catch(function(e){
+		    		makeJava.makeFailSound();
 		    		vue.$messagebox.alert(e, '错误');
 		    	});
 		    },
@@ -220,8 +222,8 @@
 		    sumPrice: function(index) {
 		    	var a = this.pp_PomainArray[index].nowiReceivedQTY;
 		    	var b = this.pp_PomainArray[index].iUnitCost;
-		    	a = a * 1;
-		    	this.otherInRdrecord[index].iPrice = (a * b).toFixed(2);
+		    	a = a * 1;	
+		    	vue.pp_PomainArray[index].iPrice = (a * b).toFixed(2);
 		    },
 		    //检查数据
 		    checkData: function(data) {
@@ -229,13 +231,15 @@
 		    		vue.$messagebox.alert("仓库不能为空！", '错误');
 		    		return false;
 		    	}
-
+		    	if (this.chooseCRdCode == '') {
+					vue.$messagebox.alert("入库类别不能为空！", '错误');
+		    		return false;
+		    	}
 		    	for (var i = 0; i < data.length; i++) {
 		    		var index = this.pp_PomainArray.indexOf(data[i])+1;
 		    		if (data[i].nowiReceivedQTY == 0){
-		    			
-		    			vue.$messagebox.alert("第"+index+"条订单的本次入库数量不能为空！");
-		    			return false;
+		    			data.splice(i,1);
+		    			i--;
 		    		}else if (data[i].nowiReceivedQTY > (data[i].fQuantity - data[i].fInQuantity)) {
 		    			vue.$messagebox.alert("第"+index+"条订单的本次入库数量不能大于入库上限范围！");
 		    			return false;

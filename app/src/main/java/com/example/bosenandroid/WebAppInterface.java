@@ -32,4 +32,16 @@ public class WebAppInterface {
         });
 
     }
+
+    @JavascriptInterface
+    public void makeSuccessSound(){
+        final MainActivity mainActivity=(MainActivity)mContext;
+        mainActivity.makeSuccessSound();
+    }
+
+    @JavascriptInterface
+    public void makeFailSound(){
+        final MainActivity mainActivity=(MainActivity)mContext;
+        mainActivity.makeFailSound();
+    }
 }

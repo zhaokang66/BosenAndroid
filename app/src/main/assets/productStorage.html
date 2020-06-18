@@ -276,9 +276,9 @@ var vue=new Vue({
 					}else {
 						this.poCMemo = "";
 						if (this.cDepName.indexOf(target.getAttribute("cDepName")) == -1) {
-							target.checked = "";
-							alert("请选择相同部门的生产订单!", '错误');
-							return;
+							// target.checked = "";
+							// alert("请选择相同部门的生产订单!", '错误');
+							// return;
 						}else {
 							this.cDepName.push(target.getAttribute("cDepName"));
 						}

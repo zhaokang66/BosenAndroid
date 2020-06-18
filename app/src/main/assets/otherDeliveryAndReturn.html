@@ -333,7 +333,6 @@ th, td{
 						vue.otherInRdrecord[index].fQuantity = 0;
 						res = false;
 						vue.$messagebox.alert("没有这个存货编码，请重新输入！","错误");
-						return;
 					} else {
 						vue.otherInRdrecord[index].cInvStd = jsonObject.cInvStd;
 						vue.otherInRdrecord[index].cInvName = jsonObject.cInvName;
@@ -373,8 +372,10 @@ th, td{
 		    		}
 		    		vue.otherInRdrecord[emptyStart].cInvCode = val;
 		    		vue.otherInRdrecord[emptyStart].fQuantity = (this.checkCInvCode(emptyStart)) ? vue.otherInRdrecord[emptyStart].fQuantity + 1 : vue.otherInRdrecord[emptyStart].fQuantity;
+		    		vue.sumPrice(emptyStart);
 		    	} else if (temp.length == 1) {
 		    		vue.otherInRdrecord[temp[0] - 1].fQuantity++;
+		    		vue.sumPrice(temp[0] - 1);
 		    	} else {
 		    		vue.$messagebox.alert("记录中有至少两条相同的存货编码，请在第"+temp.join(", ")+"行手动输入入库数量！");
 		    	}
@@ -427,9 +428,12 @@ th, td{
 		    	var url = getUrl()+"submitotherOutRrecord";
 		    	axios.post(url,submitData)
 		    	.then(function(response){
-		    		vue.$messagebox.alert(response.data);
+		    		localStorage.setItem("messageInfo",response.data);
+		    		makeJava.makeSuccessSound();
+		    		makeJava.jumpHtml("file:///android_asset/index.html");	
 		    	})
 		    	.catch(function(e){
+		    		makeJava.makeFailSound();
 		    		vue.$messagebox.alert(e, '错误');
 		    	});
 		    },
@@ -456,6 +460,14 @@ th, td{
 		    	if (this.chooseWharehouse == "") {
 		    		vue.$messagebox.alert("表体没有数据，请输入！", '错误');
 		    		return false;
+		    	}
+		    	if (this.chooseCRdCode == '') {
+			    	vue.$messagebox.alert("入库类别不能为空！", '错误');
+			    	return false;
+			   	}
+			   	if (this.choosecDepCode == '') {
+			   		vue.$messagebox.alert("部门不能为空！", '错误');
+			   		return false;
 		    	}
 		    	for (var i = 0; i < data.length; i++) {
 		    		if (data[i].cInvCode == "") {

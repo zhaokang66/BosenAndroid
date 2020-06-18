@@ -265,14 +265,14 @@ axios.defaults.timeout = 10000;
 						this.cDepName.push(target.getAttribute("cDepName"));
 					}else {
 						if (this.cDepName.indexOf(target.getAttribute("cDepName")) == -1) {
-							vue.$messagebox.alert("请选择相同部门的生产订单!", '错误');
-							target.checked="";
-							return;
+							// vue.$messagebox.alert("请选择相同部门的生产订单!", '错误');
+							// target.checked="";
+							// return;
 						}else {
 							this.cDepName.push(target.getAttribute("cDepName"));
 						}
 					}
-					var url=getUrl()+"listPP_Pomain?ID="+ID+"&bFinished=true&detailsFinshed=false";
+					var url=getUrl()+"listPP_Pomain?ID="+ID+"&bFinished=false&detailsFinshed=false";
 					axios.get(url).then(function(response) {
 						vue.$refs.topDiv2.scrollLeft=0;			        
 						var jsonObject = response.data;						

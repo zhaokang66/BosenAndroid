@@ -43,7 +43,7 @@ th, td{
 	height: 520px;
 	float: left;
 	text-align: center;
-	width: 200px;
+	width: 180px;
 }
 .eachInventoy{
 	cursor: pointer;
@@ -343,8 +343,8 @@ th, td{
 						vue.setInventory([]);
 						res = false;
 						vue.$messagebox.alert("没有这个存货编码，请重新输入！","错误");
-						return;
 					} else {
+						vue.setFlag(index);
 						vue.setInventory(jsonObject);
 						if (index == vue.maxLine - 1) {
 							vue.maxLine += 10;
@@ -379,9 +379,11 @@ th, td{
 		    			vue.maxLine += 10;
 		    		}
 		    		vue.otherInRdrecord[emptyStart].cInvCode = val;
-		    		vue.otherInRdrecord[emptyStart].fQuantity = (this.checkCInvCode(emptyStart)) ? vue.otherInRdrecord[emptyStart].fQuantity + 1 : vue.otherInRdrecord[emptyStart].fQuantity;
+		    		vue.otherInRdrecord[emptyStart].fQuantity = (this.checkCInvCode(emptyStart)) ? vue.otherInRdrecord[emptyStart].fQuantity - 1 : vue.otherInRdrecord[emptyStart].fQuantity;
+		    		vue.sumPrice(emptyStart);
 		    	} else if (temp.length == 1) {
-		    		vue.otherInRdrecord[temp[0] - 1].fQuantity++;
+		    		vue.otherInRdrecord[temp[0] - 1].fQuantity--;
+		    		vue.sumPrice(temp[0] - 1);
 		    	} else {
 		    		vue.$messagebox.alert("记录中有至少两条相同的存货编码，请在第"+temp.join(", ")+"行手动输入入库数量！");
 		    	}
@@ -433,9 +435,11 @@ th, td{
 		    	axios.post(url,submitData)
 		    	.then(function(response){
 		    		localStorage.setItem("messageInfo",response.data);
+		    		makeJava.makeSuccessSound();
 		    		makeJava.jumpHtml("file:///android_asset/index.html");	
 		    	})
 		    	.catch(function(e){
+		    		makeJava.makeFailSound();
 		    		vue.$messagebox.alert(e, '错误');
 		    	});
 		    },
