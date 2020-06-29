@@ -10,7 +10,7 @@
     position: relative;
     top:expression(this.offsetParent.scrollTop-2);
 }
-.nav{
+.navBanner{
 	position: fixed;
 	width: 100%;
 	height: 50px;
@@ -39,7 +39,7 @@
 	font-size: 20px;
 	display: block;
 }
-a{
+.navBanner a{
 	text-decoration: none;
 	color: white;
 }

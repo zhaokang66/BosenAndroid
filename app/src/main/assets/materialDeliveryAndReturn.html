@@ -67,7 +67,7 @@
 
 <body>
 <div id="app" v-cloak>
-	<div class="nav">
+	<div class="navBanner">
 		<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
 		<div class="nav_title">友成出/入库扫描系统</div>
 	</div>
@@ -75,7 +75,7 @@
 	<div style="margin-top: 60px;">
 		<input type="text" placeholder="请输入部门" class="condition" v-model="cDepName"/>
 		<input type="text" placeholder="请输入生产编号" class="condition" v-model="productionCode"/>
-		<mt-button size="small" type="primary" @click.native="selectPP_ProductPO">查询</mt-button>
+		<mt-button size="small" type="primary" @click.native="selectPP_ProductPO" :disabled="isDisable">查询</mt-button>
 	</div>
 	
 	<div style="border:1px solid black">
@@ -168,7 +168,7 @@
 			</table>
 		</div>
 	</div>	
-	<mt-button size="small" type="primary" @click="jumpOderInstock" style="float:right" :disabled="isDisable">确定</mt-button>
+	<mt-button size="small" type="primary" @click="jumpOderInstock" style="float:right">确定</mt-button>
 	<mt-button size="small" type="primary" style="float:right">取消</mt-button>
 </div>
 
@@ -207,6 +207,12 @@ axios.defaults.timeout = 10000;
 		    	setTimeout(function() {
 		    		that.isDisable = false;
 		    	},1000);
+
+		    	//初始化数组
+				this.pp_ProductPOArray = [];
+            	this.pp_PomainArray = [];
+            	this.pp_PodetailsArray = [];
+
 				var url = getUrl()+"listPP_ProductPO?bFinished=true&endId=-1&detailsFinshed=true&cDepName="+this.cDepName+"&productionCode="+this.productionCode;
 				this.pp_ProductPOArray=[]
 				this.pp_PomainArray=[]
@@ -290,6 +296,12 @@ axios.defaults.timeout = 10000;
 			
 					for(var i=0;i<this.pp_PomainArray.length;i++){
 						if(this.pp_PomainArray[i].id==ID){
+							for (var j = 0; j < this.pp_PodetailsArray.length; j++) {
+								if (this.pp_PodetailsArray[j].mainId == this.pp_PomainArray[i].mainId) {
+									this.pp_PodetailsArray.splice(j,1);
+									j--;
+								}
+							}
 							this.pp_PomainArray.splice(i,1);
 							i--;
 						}
@@ -297,13 +309,9 @@ axios.defaults.timeout = 10000;
 				}
 			},
 			jumpOderInstock:function(){
-				var that = this;
-		    	this.isDisable = true;
-		    		this.poCMemo = (this.pp_ProductPOArray.length == 1) ? this.poCMemo=this.pp_ProductPOArray[0].cMemo : '';
+				window.localStorage.clear();
+		    	this.poCMemo = (this.pp_ProductPOArray.length == 1) ? this.poCMemo=this.pp_ProductPOArray[0].cMemo : '';
 		    	var submitData = this.pp_PodetailsArray.slice();
-		    	setTimeout(function(){
-		    		that.isDisable = false;
-		    	},1000);
 				for (i in this.pp_PomainArray) {
 					if (!this.pp_PomainArray[i].checked) {
 						for (var j = 0; j < submitData.length; j++) {
@@ -314,7 +322,6 @@ axios.defaults.timeout = 10000;
 						}
 					}
 				}
-
 				console.log(submitData)
 				if (submitData.length == 0) {
 					vue.$messagebox.alert("请选择所属子项！", '错误');
@@ -322,6 +329,7 @@ axios.defaults.timeout = 10000;
 				}
 				if (typeof(Storage) !== "undefined") {
 					localStorage.setItem("pp_PodetailsArray",JSON.stringify(submitData));
+					localStorage.setItem("poCMemo",JSON.stringify(this.poCMemo));
 					makeJava.jumpHtml("file:///android_asset/materialOutStockByOrder.html");				
 				} else {
     				alert("Sorry, your browser does not support Web Storage...")
@@ -342,17 +350,6 @@ axios.defaults.timeout = 10000;
 				});	
 			}
         },
-        watch: {
-        	pp_PomainArray : function(val) {
-        		if (val != []) {
-        			this.isDisable = false;
-        		}else {
-        			this.isDisable = true;
-        		}
-        	}
-        },
-		
-
     })
 
 

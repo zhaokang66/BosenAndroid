@@ -4,7 +4,7 @@
     <!-- 引入样式 -->
     <link rel="stylesheet" href="./css/mint/style.min.css">
     <link rel="stylesheet" type="text/css" href="./css/style.css">
-	
+
 </head>
 
 <style>
@@ -23,7 +23,7 @@
     table{
         word-break:break-all;
         word-wrap:break-word;
-		
+
     }
 
     div.topDiv{
@@ -36,38 +36,38 @@
 
         overflow:scroll;
 		height:210px;
-		-webkit-overflow-scrolling: touch;		
+		-webkit-overflow-scrolling: touch;
     }
 
     table.topTable{
         width:600px;
         border-collapse:collapse;
-    }	
+    }
 	table.downTable{
         width:600px;
         border-collapse:collapse;
-	
+
     }
 	table.topTable2{
         width:1000px;
         border-collapse:collapse;
-    }	
+    }
 	table.downTable2{
         width:1000px;
         border-collapse:collapse;
     }
-   
+
 	input.condition{
 		width:100px;
 		height:20px;
 	}
-	
+
 </style>
 
 <body>
 <div id="app" v-cloak>
 
-	<div class="nav">
+	<div class="navBanner">
 		<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
 		<div class="nav_title">友成出/入库扫描系统</div>
 	</div>
@@ -76,7 +76,7 @@
 		<input type="text" placeholder="请输入供应商名称" class="condition" v-model="supplier" />
 		<mt-button size="small" type="primary" @click.native="selectPO_Pomain" :disabled="isDisable">查询</mt-button>
 	</div>
-	
+
 	<div style="border:1px solid black">
 		<!--主表-->
 		<div  @scroll="topScrollEvent" ref="topDiv" class="topDiv" >
@@ -93,7 +93,7 @@
 				</thead>
 			</table>
 		</div>
-		
+
 		<!--子表div-->
 		<div ref="downDiv" @scroll="downScrollEvent" class="downDiv" >
 
@@ -109,10 +109,10 @@
 						<td style="width:100px">{{pO_POMain.cPOID}}</td>
 						<td style="width:100px">{{pO_POMain.dPoDate}}</td>
 						<td style="width:100px">{{pO_POMain.vendor.cVenName}}</td>
-						<td style="width:100px">{{pO_POMain.cMemo}}</td>					
-					</tr>              
+						<td style="width:100px">{{pO_POMain.cMemo}}</td>
+					</tr>
 				</tbody>
-				
+
 			</table>
 		</div>
 	</div>
@@ -137,7 +137,7 @@
 				</thead>
 			</table>
 		</div>
-		
+
 		<!--采购订单子表子表div-->
 		<div ref="downDiv2" @scroll="downScrollEvent2" class="downDiv">
 
@@ -151,19 +151,18 @@
 						<td style="width:100px">{{pO_PODetails.inventory.cInvCode}}</td>
 						<td style="width:100px">{{pO_PODetails.inventory.cInvName}}</td>
 						<td style="width:100px">{{pO_PODetails.inventory.cInvStd}}</td>
-						<td style="width:100px">{{pO_PODetails.inventory.computationUnit.cComunitName}}</td>	
+						<td style="width:100px">{{pO_PODetails.inventory.computationUnit.cComunitName}}</td>
 						<td style="width:100px">{{pO_PODetails.iQuantity}}</td>
-						<td style="width:100px">{{pO_PODetails.iReceivedQTY}}</td>					
-					</tr>              
+						<td style="width:100px">{{pO_PODetails.iReceivedQTY}}</td>
+					</tr>
 				</tbody>
 			</table>
 		</div>
-	</div>	
+	</div>
 	<mt-button size="small" type="primary" @click.native="jumpOderInstock" style="float:right">确定</mt-button>
 	<mt-button size="small" type="primary" style="float:right">取消</mt-button>
 
 </div>
-
 
 </body>
 
@@ -175,7 +174,7 @@
 <script src="./js/mint/index.js"></script>
 <!--引入axios-->
 <script src="./js/vue/axios.min.js"></script>
-<script src="./js/setting.js"></script>	
+<script src="./js/setting.js"></script>
 
 <script>
 //设置axios的默认超时时间
@@ -185,19 +184,19 @@ function test(e){
 alert(e);
 	alert(document.getElementById("test2"));
 }
-		 
+
     var vue=new Vue({
         el:"#app",
         data:{
             pO_POMainArray:[],
-            pO_PODetailsArray:[],			
+            pO_PODetailsArray:[],
 			minEndId:-1,
 			isDisable: false,
 			orderNumber: '',
 			supplier: ''
         },
         methods:{
-		
+
 			selectPO_Pomain:function(){
 				var that = this;
 		    	this.isDisable = true;
@@ -211,18 +210,18 @@ alert(e);
 			},
             //加载更多
             loadMore:function(){
-		
+
 				this.loading = true;
 				if(this.minEndId!=-1){
 					//alert(this.minEndId);
 					var url = getUrl()+"listPO_Pomain?bFinished=false&endId="+this.minEndId+"&orderNumber="+this.orderNumber+"&supplier="+this.supplier;;
 					this.doLoadMore(url)
-					
+
 				}
                 this.loading = false;
-            },      
-			
-			
+            },
+
+
 		    topScrollEvent:function(e){
 
 			    this.$refs.downDiv.scrollLeft=this.$refs.topDiv.scrollLeft;
@@ -230,7 +229,7 @@ alert(e);
 		    },
 		    downScrollEvent:function(e){
 		    	this.$refs.topDiv.scrollLeft=this.$refs.downDiv.scrollLeft;
-			   
+
 		    },
 			topScrollEvent2:function(e){
 
@@ -239,7 +238,7 @@ alert(e);
 		    },
 		    downScrollEvent2:function(e){
 		    	this.$refs.topDiv2.scrollLeft=this.$refs.downDiv2.scrollLeft;
-			  
+
 		    },
 		    doLoadMore:function(url){
 				axios.get(url).then(function(response) {
@@ -253,29 +252,29 @@ alert(e);
 					}
 					console.log(jsonObject)
 					vue.minEndId=jsonObject[jsonObject.length-1].pOID;
-					vue.pO_POMainArray=vue.pO_POMainArray.concat(jsonObject);					
+					vue.pO_POMainArray=vue.pO_POMainArray.concat(jsonObject);
 				}).catch(function (e) {
 					vue.$messagebox.alert(e, '错误');
 				});
 		    },
 			checkboxClick:function(e){
-					
+
 				var target=e.target
 				if(e.target.getAttribute("class")=="inputTd"){
 					var target=e.target.firstChild
-					
+
 					if(target.checked)
 						target.checked=""
 					else
 						target.checked="checked"
 				}
 				var pOID=target.getAttribute("pOID");
-				
+
 				if(target.checked){
 					var url= getUrl()+"listPO_Podetails?pOID="+pOID+"&bFinished=false";
 					axios.get(url).then(function(response) {
-					vue.$refs.topDiv2.scrollLeft=0;			        
-					var jsonObject = response.data;						
+					vue.$refs.topDiv2.scrollLeft=0;
+					var jsonObject = response.data;
 					for(each in jsonObject){
 						jsonObject[each].checked="true";
 					}
@@ -286,7 +285,7 @@ alert(e);
 						vue.$messagebox.alert(e, '错误');
 					});
 				}else{
-				
+
 					for(var i=0;i<this.pO_PODetailsArray.length;i++){
 						if(this.pO_PODetailsArray[i].pOID==pOID){
 							this.pO_PODetailsArray.splice(i,1);
@@ -295,7 +294,7 @@ alert(e);
 					}
 				}
 			},
-			jumpOderInstock:function(){	
+			jumpOderInstock:function(){
 				window.localStorage.clear();
 				var submitData = vue.pO_PODetailsArray.slice();
 				for (var i = 0; i < submitData.length; i++) {
@@ -316,10 +315,10 @@ alert(e);
     				alert("Sorry, your browser does not support Web Storage...")
 				}
 		}
-		
+
 
         },
-		
+
 
     })
 
