@@ -26,16 +26,7 @@ import com.honeywell.aidc.TriggerStateChangeEvent;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.SoundPool;
-import android.os.Bundle;
-import android.view.KeyEvent;
-import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.Toast;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -147,10 +138,10 @@ public class MainActivity extends AppCompatActivity  implements BarcodeReader.Tr
                 public void run() {
                     Toast.makeText(MainActivity.this, barcodeData, Toast.LENGTH_SHORT).show();
                     webView.loadUrl("javascript:vue.addiReceivedQTY('"+barcodeData+"')");
+                    webView.loadUrl("javascript:vue.test('"+barcodeData+"nide ')");
                 }
             });
         }
-
     }
     @Override
     public void onFailureEvent(BarcodeFailureEvent barcodeFailureEvent) {

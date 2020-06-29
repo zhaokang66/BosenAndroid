@@ -3,6 +3,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- 引入样式 -->
     <link rel="stylesheet" href="./css/mint/style.min.css">
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
 	
 </head>
 <style>
@@ -14,7 +15,7 @@
         display: none;
 	}
 	#app{
-		min-width: 1446px;
+		min-width: 1100px;
 	}
 	table{
         word-break:break-all;
@@ -30,7 +31,7 @@
     }
 	 div.downDiv{
         overflow:scroll;
-		height: 520px;
+		height: 500px;
 		-webkit-overflow-scrolling: touch;		
     }
     .red{
@@ -43,9 +44,12 @@
 </style>
 <div id="app" v-cloak>
 
-	<mt-button size="small " type="primary" @click.native="selectPO_Pomain" style="visibility:hidden">查询
-	</mt-button>
-	<div style="border:1px solid black">
+	
+		<div class="nav">
+			<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
+			<div class="nav_title">友成出/入库扫描系统</div>
+		</div>
+	<div style="border:1px solid black;margin-top: 60px;">
 		<select v-model="chooseWharehouse">
 			<option value="">选择仓库</option>
 			<option :value="list.cWhCode" v-for="list in listWharehouse">{{list.cWhCode}} {{list.cWhName}}</option>
@@ -56,18 +60,18 @@
 				<thead>
 					<tr>
 						<th style="width:100px">序号</th>
-						<th style="width:100px">POID</th>
-						<th style="width:100px">id</th>
 						<th style="width:100px">仓库</th>
 						<th style="width:100px">生产编号</th>
+						<th style="width:100px">本次入库数量</th>
+						<th style="width:100px">已入库数量</th>
+						<th style="width:100px">待入库数量</th>
+						<th style="width:100px">数量</th>
 						<th style="width:100px">存货编码</th>
 						<th style="width:100px">存货名称</th>
 						<th style="width:100px">规格型号</th>
 						<th style="width:100px">单位</th>
-						<th style="width:100px">数量</th>
-						<th style="width:100px">已入库数量</th>
-						<th style="width:100px">待入库数量</th>
-						<th style="width:100px">本次入库数量</th>
+
+
 					</tr>
 				</thead>
 			</table>
@@ -80,24 +84,24 @@
 				<tbody  id="list_info">
 					<tr v-for="(pO_PODetails,,index) in pO_PODetailsArray" class="red">
 						<td style="width:100px">{{index+1}}</td>
-						<td style="width:100px">{{pO_PODetails.pOID}}</td>
-						<td style="width:100px">{{pO_PODetails.id}}</td>
 						<td style="width:100px" align="center"  >
 							<select  v-model="pO_PODetails.cWhCode" style="width: 98%;" >
 								<option :value="list.cWhCode" v-for="list in listWharehouse">{{list.cWhCode}} {{list.cWhName}}</option>
 							</select>
 						</td>
 						<td style="width:100px">{{pO_PODetails.productionCode}}</td>
+						<td style="width:100px" align="center">
+							<input type="number" style="width: 50px;" :value="pO_PODetails.nowiReceivedQTY" v-model.number="pO_PODetails.nowiReceivedQTY" @change="bgColor(index)">
+						</td>		
+						<td style="width:100px">{{pO_PODetails.iReceivedQTY}}</td>
+						<td style="width:100px">{{pO_PODetails.iQuantity - pO_PODetails.iReceivedQTY}}</td>
+						<td style="width:100px">{{pO_PODetails.iQuantity}}</td>			
 						<td style="width:100px">{{pO_PODetails.inventory.cInvCode}}</td>
 						<td style="width:100px">{{pO_PODetails.inventory.cInvName}}</td>
 						<td style="width:100px">{{pO_PODetails.inventory.cInvStd}}</td>
 						<td style="width:100px">{{pO_PODetails.inventory.computationUnit.cComunitName}}</td>	
-						<td style="width:100px">{{pO_PODetails.iQuantity}}</td>
-						<td style="width:100px">{{pO_PODetails.iReceivedQTY}}</td>
-						<td style="width:100px">{{pO_PODetails.iQuantity - pO_PODetails.iReceivedQTY}}</td>
-						<td style="width:100px" align="center">
-							<input type="number" style="width: 50px;" :value="pO_PODetails.nowiReceivedQTY" v-model.number="pO_PODetails.nowiReceivedQTY" @change="bgColor(index)">
-						</td>					
+					
+						
 					</tr>              
 				</tbody>
 			</table>
@@ -179,7 +183,7 @@
 		    				return false;
 		    			}
 		    			if (data[i].nowiReceivedQTY > (data[i].iQuantity -data[i].iReceivedQTY)) {
-		    				vue.$messagebox.alert("本次入库数量不能大于入库上限！","错误");
+		    				vue.$messagebox.alert("第"+index+"条数据的本次入库数量不能大于入库上限！","错误");
 		    				return false;
 		    			}
 		    		}

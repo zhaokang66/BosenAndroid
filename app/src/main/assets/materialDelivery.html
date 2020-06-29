@@ -3,6 +3,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- 引入样式 -->
     <link rel="stylesheet" href="./css/mint/style.min.css">
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
 	
 </head>
 
@@ -35,7 +36,7 @@
     div.downDiv{
 
         overflow:scroll;
-		height:230px;
+		height:210px;
 		-webkit-overflow-scrolling: touch;		
     }
 
@@ -66,10 +67,13 @@
 
 <body>
 <div id="app" v-cloak>
-
-	<div>
-		<input type="text" placeholder="请输入采购订单号" class="condition"/>
-		<input type="text" placeholder="请输入供应商名称" class="condition"/>
+	<div class="nav">
+		<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
+		<div class="nav_title">友成出/入库扫描系统</div>
+	</div>
+	<div style="margin-top: 60px;">
+		<input type="text" placeholder="请输入部门" class="condition" v-model="cDepName" />
+		<input type="text" placeholder="请输入生产编号" class="condition" v-model="productionCode" />
 		<mt-button size="small" type="primary" @click.native="selectPP_ProductPO">查询</mt-button>
 	</div>
 	
@@ -100,8 +104,7 @@
 				   border="1">
 				<tbody>
 					<tr v-for="pp_ProductPO in pp_ProductPOArray">
-						<td style="width:100px "  align="center" @click="checkboxClick"  class="inputTd"><input type="checkbox" v-model="pp_ProductPO.checked"  :id="pp_ProductPO.id"
-							:cDepName="pp_ProductPO.cDepName"/></td>
+						<td style="width:100px "  align="center" @click="checkboxClick"  class="inputTd"><input type="checkbox" v-model="pp_ProductPO.checked"  :id="pp_ProductPO.id"/></td>
 						<td style="width:100px">{{pp_ProductPO.id}}</td>
 						<td style="width:100px">{{pp_ProductPO.cCode}}</td>
 						<td style="width:100px">{{pp_ProductPO.cDepName}}</td>
@@ -121,8 +124,6 @@
 				<thead>
 					<tr>
 						<th style="width:100px">选择</th>
-						<th style="width:100px">ID</th>
-						<th style="width:100px">MainId</th>
 						<th style="width:100px">生产计划号</th>
 						<th style="width:100px">存货编码</th>
 						<th style="width:100px">存货名称</th>
@@ -140,13 +141,10 @@
 		
 		<!--采购订单子表子表div-->
 		<div ref="downDiv2" @scroll="downScrollEvent2" class="downDiv">
-
 			<table class="downTable2" border="1">
 				<tbody>
 					<tr v-for="pp_Pomain in pp_PomainArray">
 						<td style="width:100px;text-align:center" ><input type="checkbox" v-model="pp_Pomain.checked" style="zoom:150%;"/></td>
-						<td style="width:100px">{{pp_Pomain.id}}</td>
-						<td style="width:100px">{{pp_Pomain.mainId}}</td>
 						<td style="width:100px">{{pp_Pomain.productionCode}}</td>
 						<td style="width:100px">{{pp_Pomain.inventory.cInvCode}}</td>
 						<td style="width:100px">{{pp_Pomain.inventory.cInvName}}</td>
@@ -190,12 +188,20 @@ axios.defaults.timeout = 10000;
             pp_PomainArray:[],	
             pp_PodetailsArray: [],
 			minEndId:-1,
-			isDisable: true,
-			cDepName: []
+			isDisable: false,
+			cDepName: '',
+			productionCode: '',
+			poCMemo: ''
         },
         methods:{
 			selectPP_ProductPO:function(){
-				var url = getUrl()+"listPP_ProductPO?bFinished=true&endId=-1&detailsFinshed=false"
+				var that = this;
+		    	this.isDisable = true;
+		    	setTimeout(function() {
+		    		that.isDisable = false;
+		    	},1000);
+				var url = getUrl()+"listPP_ProductPO?bFinished=true&endId=-1&detailsFinshed=false&cDepName="+this.cDepName+"&productionCode="+this.productionCode;
+				// return;
 				this.pp_ProductPOArray=[]
 				this.pp_PomainArray=[]
 				this.doLoadMore(url)
@@ -205,7 +211,7 @@ axios.defaults.timeout = 10000;
 				this.loading = true;
 				if(this.minEndId!=-1){
 					//alert(this.minEndId);
-					var url = getUrl()+"listPP_ProductPO?bFinished=true&detailsFinshed=false&endId="+this.minEndId;
+					var url = getUrl()+"listPP_ProductPO?bFinished=true&detailsFinshed=false&endId="+this.minEndId+"&detailsFinshed=false&cDepName="+this.cDepName+"&productionCode="+this.productionCode;;
 					this.doLoadMore(url)
 					
 				}
@@ -261,18 +267,7 @@ axios.defaults.timeout = 10000;
 				}
 				var ID=target.getAttribute("id");
 				if(target.checked){
-					if (this.cDepName.length == 0) {
-						this.cDepName.push(target.getAttribute("cDepName"));
-					}else {
-						if (this.cDepName.indexOf(target.getAttribute("cDepName")) == -1) {
-							// vue.$messagebox.alert("请选择相同部门的生产订单!", '错误');
-							// target.checked="";
-							// return;
-						}else {
-							this.cDepName.push(target.getAttribute("cDepName"));
-						}
-					}
-					var url=getUrl()+"listPP_Pomain?ID="+ID+"&bFinished=false&detailsFinshed=false";
+					var url=getUrl()+"listPP_Pomain?ID="+ID+"&detailsFinshed=false&bFinished=true";	
 					axios.get(url).then(function(response) {
 						vue.$refs.topDiv2.scrollLeft=0;			        
 						var jsonObject = response.data;						
@@ -286,10 +281,6 @@ axios.defaults.timeout = 10000;
 						vue.$messagebox.alert(e, '错误');
 					});
 				}else{
-					if (this.cDepName.length != 0) {
-						this.cDepName.splice(this.cDepName.length-1,1);
-					}
-
 					for(var i=0;i<this.pp_PomainArray.length;i++){
 						if(this.pp_PomainArray[i].id==ID){
 							this.pp_PomainArray.splice(i,1);
@@ -302,6 +293,7 @@ axios.defaults.timeout = 10000;
 				window.localStorage.clear();
 				var that = this;
 		    	this.isDisable = true;
+		    	this.poCMemo = (this.pp_ProductPOArray.length == 1) ? this.poCMemo=this.pp_ProductPOArray[0].cMemo : '';
 		    	var submitData = this.pp_PodetailsArray.slice();
 		    	setTimeout(function() {
 		    		that.isDisable = false;

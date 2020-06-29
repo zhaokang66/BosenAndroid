@@ -3,6 +3,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- 引入样式 -->
     <link rel="stylesheet" href="./css/mint/style.min.css">
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
 	
 </head>
 <style>
@@ -14,7 +15,7 @@
         display: none;
 	}
 	#app{
-		min-width: 1600px;
+		min-width: 1400px;
 	}
 	table{
         word-break:break-all;
@@ -29,7 +30,7 @@
     }
 	 div.downDiv{
         overflow:scroll;
-		height: 520px;
+		height: 500px;
 		-webkit-overflow-scrolling: touch;		
     }
     .red{
@@ -41,8 +42,11 @@
 	
 </style>	
 <div id="app" v-cloak>
-	<mt-button size="small " type="primary" @click.native="selectPO_Pomain" style="visibility:hidden">查询</mt-button>
-	<div style="border:1px solid black">
+	<div class="nav">
+		<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
+		<div class="nav_title">友成出/入库扫描系统</div>
+	</div>
+	<div style="border:1px solid black;margin-top: 30px;">
 		<select v-model="chooseWharehouse">
 			<option value="">选择仓库</option>
 			<option :value="list.cWhCode" v-for="list in listWharehouse">{{list.cWhCode}} {{list.cWhName}}</option>
@@ -59,21 +63,20 @@
 				<thead>
 					<tr>
 						<th style="width:100px">序号</th>
-						<th style="width:100px">ID</th>
-						<th style="width:100px">MainId</th>
 						<th style="width:100px">生产计划号</th>
+						<th style="width:100px">本次入库数量</th>
+						<th style="width:100px">单价</th>
 						<th style="width:100px">存货编码</th>
 						<th style="width:100px">存货名称</th>
 						<th style="width:100px">规格型号</th>
-						<th style="width:100px">开工日期</th>
-						<th style="width:100px">完工日期</th>
-						<th style="width:100px">单位</th>
-						<th style="width:100px">单价</th>
-						<th style="width:100px">金额</th>
 						<th style="width:100px">应入库数量</th>
 						<th style="width:100px">已入库数量</th>
 						<th style="width:100px">待入库数量</th>
-						<th style="width:100px">本次入库数量</th>
+						<th style="width:100px">开工日期</th>
+						<th style="width:100px">完工日期</th>
+						<th style="width:100px">金额</th>
+						<th style="width:100px">单位</th>
+						
 					</tr>
 				</thead>
 			</table>
@@ -86,28 +89,26 @@
 				<tbody  id="list_info">
 					<tr v-for="(pp_Pomain,index) in pp_PomainArray" class="red">
 						<td style="width:100px">{{index+1}}</td>
-						<td style="width:100px">{{pp_Pomain.id}}</td>
-						<td style="width:100px">{{pp_Pomain.mainId}}</td>
 						<td style="width:100px">
 							<input type="number" style="width: 98%;" :value="pp_Pomain.productionCode" v-model="pp_Pomain.productionCode">
+						</td>
+						<td style="width:100px" align="center">
+							<input type="number" style="width: 98%;" :value="pp_Pomain.nowiReceivedQTY" v-model.number="pp_Pomain.nowiReceivedQTY" @change="bgColor(index)">
+						</td>					
+						<td style="width:100px">
+							<input type="number" :value="pp_Pomain.iUnitCost" v-model.number="pp_Pomain.iUnitCost" style="width: 98%;" @change="sumPrice(index)">
 						</td>
 						<td style="width:100px">{{pp_Pomain.inventory.cInvCode}}</td>
 						<td style="width:100px">{{pp_Pomain.inventory.cInvName}}</td>
 						<td style="width:100px">{{pp_Pomain.inventory.cInvStd}}</td>
-						<td style="width:100px">{{pp_Pomain.dStartDate}}</td>
-						<td style="width:100px">{{pp_Pomain.dEndDate}}</td>
-						<td style="width:100px">
-						{{pp_Pomain.inventory.computationUnit.cComunitName}}</td>
-						<td style="width:100px">
-							<input type="number" :value="pp_Pomain.iUnitCost" v-model.number="pp_Pomain.iUnitCost" style="width: 98%;" @change="sumPrice(index)">
-						</td>
-						<td style="width:100px">{{pp_Pomain.iPrice}}</td>	
 						<td style="width:100px">{{pp_Pomain.fQuantity}}</td>
 						<td style="width:100px">{{pp_Pomain.fInQuantity}}</td>
 						<td style="width:100px">{{pp_Pomain.fQuantity - pp_Pomain.fInQuantity}}</td>
-						<td style="width:100px" align="center">
-							<input type="number" style="width: 98%;" :value="pp_Pomain.nowiReceivedQTY" v-model.number="pp_Pomain.nowiReceivedQTY" @change="bgColor(index)">
-						</td>					
+						<td style="width:100px">{{pp_Pomain.dStartDate}}</td>
+						<td style="width:100px">{{pp_Pomain.dEndDate}}</td>
+						<td style="width:100px">{{pp_Pomain.iPrice}}</td>	
+						<td style="width:100px">
+						{{pp_Pomain.inventory.computationUnit.cComunitName}}</td>
 					</tr>              
 				</tbody>	
 			</table>
@@ -126,7 +127,7 @@
 <script src="./js/setting.js"></script>
 <script>
 	var pp_PomainArray = JSON.parse(localStorage.getItem("pp_PomainArray"));
-	var poCMemo = JSON.parse(localStorage.getItem("poCMemo"));
+	var CMemo = JSON.parse(localStorage.getItem("poCMemo"));
 
 	//初始化
 	for (var i = 0; i< pp_PomainArray.length; i++) {
@@ -141,7 +142,7 @@
 			chooseWharehouse: '',
 			listWharehouse: [],
 			isDisable: false,
-			poCMemo: poCMemo,
+			poCMemo: CMemo,
 			listRdStyle: [],
 			chooseCRdCode: ''
 		},

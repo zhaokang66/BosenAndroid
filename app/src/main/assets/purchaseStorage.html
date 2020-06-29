@@ -3,6 +3,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- 引入样式 -->
     <link rel="stylesheet" href="./css/mint/style.min.css">
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
 	
 </head>
 
@@ -34,7 +35,7 @@
     div.downDiv{
 
         overflow:scroll;
-		height:230px;
+		height:210px;
 		-webkit-overflow-scrolling: touch;		
     }
 
@@ -66,9 +67,13 @@
 <body>
 <div id="app" v-cloak>
 
-	<div>
-		<input type="text" placeholder="请输入采购订单号" class="condition"/>
-		<input type="text" placeholder="请输入供应商名称" class="condition"/>
+	<div class="nav">
+		<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
+		<div class="nav_title">友成出/入库扫描系统</div>
+	</div>
+	<div style="margin-top: 60px;">
+		<input type="text" placeholder="请输入采购订单号" class="condition" v-model="orderNumber"/>
+		<input type="text" placeholder="请输入供应商名称" class="condition" v-model="supplier" />
 		<mt-button size="small" type="primary" @click.native="selectPO_Pomain" :disabled="isDisable">查询</mt-button>
 	</div>
 	
@@ -187,21 +192,19 @@ alert(e);
             pO_POMainArray:[],
             pO_PODetailsArray:[],			
 			minEndId:-1,
-			isDisable: false
+			isDisable: false,
+			orderNumber: '',
+			supplier: ''
         },
         methods:{
 		
-			
-			test:function(){
-				alert("ok")
-			},
 			selectPO_Pomain:function(){
 				var that = this;
 		    	this.isDisable = true;
 		    	setTimeout(function() {
 		    		that.isDisable = false;
 		    	},1000);
-				var url = getUrl()+"listPO_Pomain?bFinished=false&endId=-1"
+				var url = getUrl()+"listPO_Pomain?bFinished=false&endId=-1&orderNumber="+this.orderNumber+"&supplier="+this.supplier;
 				this.pO_POMainArray=[]
 				this.pO_PODetailsArray=[]
 				this.doLoadMore(url)
@@ -212,7 +215,7 @@ alert(e);
 				this.loading = true;
 				if(this.minEndId!=-1){
 					//alert(this.minEndId);
-					var url = getUrl()+"listPO_Pomain?bFinished=false&endId="+this.minEndId;
+					var url = getUrl()+"listPO_Pomain?bFinished=false&endId="+this.minEndId+"&orderNumber="+this.orderNumber+"&supplier="+this.supplier;;
 					this.doLoadMore(url)
 					
 				}

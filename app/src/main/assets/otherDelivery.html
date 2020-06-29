@@ -6,6 +6,7 @@
 		<link rel="stylesheet" href="./css/bootstrap/3.3.7/bootstrap.min.css">
 		<script src="./js/jquery/2.1.1/jquery.min.js"></script>
 		<script src="./js/bootstrap/3.3.7/bootstrap.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="./css/style.css">
 		
 	</head>
 	<style>
@@ -66,8 +67,11 @@
 	}
 	</style>	
 	<div id="app" v-cloak>
-		<mt-button size="small " type="primary" @click.native="selectPO_Pomain" style="visibility:hidden">查询</mt-button>
-		<div style="border:1px solid black">
+		<div class="nav">
+			<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
+			<div class="nav_title">友成出/入库扫描系统</div>
+		</div>
+		<div style="border:1px solid black;margin: 60px 0 0 10px;">
 			<select v-model="chooseWharehouse">
 				<option value="">选择仓库</option>
 				<option :value="list.cWhCode" v-for="list in listWharehouse">{{list.cWhCode}} {{list.cWhName}}</option>

@@ -1,5 +1,7 @@
-
-
+/**{
+	padding: 0;
+	margin: 0;
+}*/
 .red{
     background-color:red;
 }
@@ -7,4 +9,37 @@
 .fixedHead {
     position: relative;
     top:expression(this.offsetParent.scrollTop-2);
+}
+.nav{
+	position: fixed;
+	width: 100%;
+	height: 50px;
+	background-color:#0c5adc;
+	left: 0;
+	top: 0;
+}
+.back{
+	height: 50px;
+	line-height: 50px;
+	color: white;
+	width: 59px;
+	font-family: cursive;
+	font-size: 22px;
+	text-align: center;
+	float: left;
+}
+.nav_title{
+	width: 200px;
+	height: 50px;
+	line-height: 50px;
+	color: white;
+	margin-left: 59px;
+	float: left;
+	font-family: sans-serif;
+	font-size: 20px;
+	display: block;
+}
+a{
+	text-decoration: none;
+	color: white;
 }

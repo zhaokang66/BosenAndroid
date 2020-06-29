@@ -3,6 +3,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- 引入样式 -->
     <link rel="stylesheet" href="./css/mint/style.min.css">
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
 	
 </head>
 
@@ -35,7 +36,7 @@
     div.downDiv{
 
         overflow:scroll;
-		height:230px;
+		height:210px;
 		-webkit-overflow-scrolling: touch;		
     }
 
@@ -66,10 +67,13 @@
 
 <body>
 <div id="app" v-cloak>
-
-	<div>
-		<input type="text" placeholder="请输入采购订单号" class="condition"/>
-		<input type="text" placeholder="请输入供应商名称" class="condition"/>
+	<div class="nav">
+		<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
+		<div class="nav_title">友成出/入库扫描系统</div>
+	</div>
+	<div style="margin-top: 60px;">
+		<input type="text"  placeholder="请输入部门" class="condition" v-model="cDepName"/>
+		<input type="text"placeholder="请输入生产编号" class="condition" v-model="productionCode"/>
 		<mt-button size="small" type="primary" @click.native="selectPP_ProductPO" :disabled="isDisable">查询</mt-button>
 	</div>
 	
@@ -100,7 +104,7 @@
 				   border="1">
 				<tbody>
 					<tr v-for="pp_ProductPO in pp_ProductPOArray">
-						<td style="width:100px "  align="center" @click="checkboxClick"  class="inputTd"><input type="checkbox" v-model="pp_ProductPO.checked"  :id="pp_ProductPO.id" :cDepName="pp_ProductPO.cDepName" :cMemo="pp_ProductPO.cMemo"/></td>
+						<td style="width:100px "  align="center" @click="checkboxClick"  class="inputTd"><input type="checkbox" v-model="pp_ProductPO.checked"  :id="pp_ProductPO.id" /></td>
 						<td style="width:100px">{{pp_ProductPO.id}}</td>
 						<td style="width:100px">{{pp_ProductPO.cCode}}</td>
 						<td style="width:100px">{{pp_ProductPO.cDepName}}</td>
@@ -189,7 +193,9 @@ axios.defaults.timeout = 10000;
 			minEndId:-1,
 			cDepName: [],
 			poCMemo: '',
-			isDisable: false
+			isDisable: false,
+			cDepName: '',
+			productionCode: ''
         },
         methods:{
 			selectPP_ProductPO:function(){
@@ -198,7 +204,7 @@ axios.defaults.timeout = 10000;
 				setTimeout(function() {
 					that.isDisable = false;
 				},1000);
-				var url = getUrl()+"listPP_ProductPO?bFinished=true&endId=-1&detailsFinshed=true"
+				var url = getUrl()+"listPP_ProductPO?bFinished=true&endId=-1&detailsFinshed=true&cDepName="+this.cDepName+"&productionCode="+this.productionCode;
 				this.pp_ProductPOArray=[]
 				this.pp_PomainArray=[]
 				this.doLoadMore(url)
@@ -208,7 +214,7 @@ axios.defaults.timeout = 10000;
 				this.loading = true;
 				if(this.minEndId!=-1){
 					//alert(this.minEndId);
-					var url = getUrl()+"listPP_ProductPO?bFinished=true&detailsFinshed=true&endId="+this.minEndId;
+					var url = getUrl()+"listPP_ProductPO?bFinished=true&detailsFinshed=true&endId="+this.minEndId+"&cDepName="+this.cDepName+"&productionCode="+this.productionCode;
 					this.doLoadMore(url)
 					
 				}
@@ -264,19 +270,6 @@ axios.defaults.timeout = 10000;
 				}
 				var ID=target.getAttribute("id");
 				if(target.checked){
-					if (this.cDepName.length == 0) {
-						this.cDepName.push(target.getAttribute("cDepName"));
-						this.poCMemo = target.getAttribute("cMemo");
-					} else {
-						this.cMemo = "";
-						if (this.cDepName.indexOf(target.getAttribute("cDepName")) == -1) {
-							// target.checked = "";
-							// alert("请选择相同部门！");
-							// return;
-						} else {
-							this.cDepName.push(target.getAttribute("cDepName"));
-						}
-					}
 					var url = getUrl()+"listPP_Pomain?ID="+ID+"&bFinished=true&detailsFinshed=true";
 					axios.get(url).then(function(response) {
 					vue.$refs.topDiv2.scrollLeft=0;			        
@@ -291,9 +284,6 @@ axios.defaults.timeout = 10000;
 						vue.$messagebox.alert(e, '错误');
 					});
 				}else{
-					if (this.cDepName.length != 0) {
-						this.cDepName.splice(this.cDepName.length - 1, 1);
-					}
 					for(var i=0;i<this.pp_PomainArray.length;i++){
 						if(this.pp_PomainArray[i].id==ID){
 							this.pp_PomainArray.splice(i,1);
@@ -304,6 +294,7 @@ axios.defaults.timeout = 10000;
 			},
 			jumpOderInstock:function(){	
 				window.localStorage.clear();
+				this.poCMemo = (this.pp_ProductPOArray.length == 1) ? this.poCMemo=this.pp_ProductPOArray[0].cMemo : '';
 				var submitData = vue.pp_PomainArray.slice();
 				for (var i = 0; i < submitData.length; i++) {
 					if (!submitData[i].checked) {

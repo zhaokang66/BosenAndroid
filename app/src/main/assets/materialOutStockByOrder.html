@@ -3,6 +3,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- 引入样式 -->
     <link rel="stylesheet" href="./css/mint/style.min.css">
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
 	
 </head>
 <style>
@@ -14,7 +15,7 @@
         display: none;
 	}
 	#app{
-		min-width: 1857px;
+		min-width: 1200px;
 	}
 	table{
         word-break:break-all;
@@ -29,7 +30,7 @@
     }
 	 div.downDiv{
         overflow:scroll;
-		height: 520px;
+		/*height: 520px;*/
 		-webkit-overflow-scrolling: touch;		
     }
     .red{
@@ -41,8 +42,11 @@
 	
 </style>	
 <div id="app" v-cloak>
-	<mt-button size="small " type="primary" @click.native="selectPO_Pomain" style="visibility:hidden">查询</mt-button>
-	<div style="border:1px solid black">
+	<div class="nav">
+		<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
+		<div class="nav_title">友成出/入库扫描系统</div>
+	</div>
+	<div style="border:1px solid black;margin-top: 60px;">
 		<select v-model="chooseWharehouse">
 			<option value="">选择仓库</option>
 			<option :value="list.cWhCode" v-for="list in listWharehouse">{{list.cWhCode}} {{list.cWhName}}</option>
@@ -52,27 +56,26 @@
 		<option :value="list.cRdCode" v-for="list in listRdStyle">{{list.cRdCode}} {{list.cRdName}}</option>
 		</select>
 		<label>备注：</label>
-		<input type="text" name="cMemo" v-model="cMemo">
+		<input type="text" name="poCMemo" v-model="poCMemo">
 	<!--采购订单子表主表-->
 		<div  @scroll="topScrollEvent2" ref="topDiv2" class="topDiv">
 			<table class="topTable2" border="1">
 				<thead>
 					<tr>
 						<th style="width:100px">序号</th>
-						<th style="width:100px">选择</th>
-						<th style="width:100px">SubID</th>
-						<th style="width:100px">MainId</th>
 						<th style="width:100px">生产计划号</th>
 						<th style="width:100px">存货编码</th>
+						<th style="width:100px">本次出库数量</th>
+						<th style="width:100px">单价</th>
+						<th style="width:100px">已出库数量</th>
+						<th style="width:100px">待出库数量</th>
+						<th style="width:100px">数量</th>
 						<th style="width:100px">存货名称</th>
 						<th style="width:100px">规格型号</th>
 						<th style="width:100px">单位</th>
-						<th style="width:100px">单价</th>
 						<th style="width:100px">金额</th>
-						<th style="width:100px">数量</th>
-						<th style="width:100px">已出库数量</th>
-						<th style="width:100px">待出库数量</th>
-						<th style="width:100px">本次出库数量</th>
+						
+						
 					</tr>
 				</thead>
 			</table>
@@ -85,44 +88,60 @@
 				<tbody  id="list_info">
 					<tr v-for="(pp_Podetails,index) in pp_PodetailsArray" class="red">
 						<td style="width:100px">{{index+1}}</td>
-						<td style="width:100px">{{pp_Podetails.subId}}</td>
-						<td style="width:100px">{{pp_Podetails.mainId}}</td>
 						<td style="width:100px">
 							<input type="number" style="width: 98%;" :value="pp_Podetails.cDefine22" v-model="pp_Podetails.cDefine22">
 						</td>
 						<td style="width:100px">{{pp_Podetails.inventory.cInvCode}}</td>
+						<td style="width:100px" align="center">
+							<input type="number" style="width: 50px;" :value="pp_Podetails.nowiReceivedQTY" v-model.number="pp_Podetails.nowfOutQuantity" @change="bgColor(index)">
+						</td>
+						<td style="width:100px">
+							<input type="number" :value="pp_Podetails.iUnitCost" v-model.number="pp_Podetails.iUnitCost" style="width: 98%;" @change="sumPrice(index)">
+						</td>
+						<td style="width:100px">{{pp_Podetails.fOutQuantity}}</td>
+						<td style="width:100px">{{pp_Podetails.fQuantity - pp_Podetails.fOutQuantity}}</td>
+						<td style="width:100px">{{pp_Podetails.fQuantity}}</td>
 						<td style="width:100px">{{pp_Podetails.inventory.cInvName}}</td>
 						<td style="width:100px">{{pp_Podetails.inventory.cInvStd}}</td>
 						<td style="width:100px">
 						{{pp_Podetails.inventory.computationUnit.cComunitName}}</td>
-						<td style="width:100px">
-							<input type="number" :value="pp_Podetails.iUnitCost" v-model.number="pp_Podetails.iUnitCost" style="width: 98%;" @change="sumPrice(index)">
-						</td>
+						
 						<td style="width:100px">{{pp_Podetails.iPrice}}</td>	
-						<td style="width:100px">{{pp_Podetails.fQuantity}}</td>
-						<td style="width:100px">{{pp_Podetails.fOutQuantity}}</td>
-						<td style="width:100px">{{pp_Podetails.fQuantity - pp_Podetails.fOutQuantity}}</td>
-						<td style="width:100px" align="center">
-							<input type="number" style="width: 50px;" :value="pp_Podetails.nowiReceivedQTY" v-model.number="pp_Podetails.nowfOutQuantity" @change="bgColor(index)">
-						</td>					
+						
+											
 					</tr>              
 				</tbody>	
 			</table>
+		</div>
+		<br>
+		<br>
+		<div>签名：</div>
+		<div id="signature" style="border:1px dotted black"></div>
+		<div>
+			<mt-button size="small " type="primary" @click.native="reset">重置</mt-button>
 			<mt-button size="small " type="primary" @click.native="submitpp_Pomain" :disabled="isDisable">提交</mt-button>
+
 		</div>
 	</div>
 </div>
 
 <!-- 先引入 Vue -->
-<script src="./js/vue/vue2.6.10.js"></script>
-<script src="./js/jquery/jquery3.4.1.js" ></script>
-<!-- 引入组件库 -->
-<script src="./js/mint/index.js"></script>
-<!--引入axios-->
-<script src="./js/vue/axios.min.js"></script>
-<script src="./js/setting.js"></script>
+
+	<script src="./js/jquery/jquery3.4.1.js" ></script>
+	<!-- 先引入 Vue -->
+	<script src="./js/vue/vue2.6.10.js"></script>
+	<!-- 引入组件库 -->
+	<script src="./js/mint/index.js"></script>
+	<script src="./js/jSignature/jSignature.min.js"></script>
+	<script src="./js/vue/axios.min.js"></script>	
+	<script src="https://cdn.bootcss.com/qs/6.5.1/qs.min.js"></script>
+	<script src="./js/setting.js"></script>
 <script>
+	$(document).ready(function() {
+			$("#signature").jSignature()
+		})
 	var pp_PodetailsArray = JSON.parse(localStorage.getItem("pp_PodetailsArray"));
+	var CMemo = JSON.parse(localStorage.getItem("poCMemo"));
 	//初始化
 	for (var i = 0; i< pp_PodetailsArray.length; i++) {
 		pp_PodetailsArray[i].nowfOutQuantity = 0;
@@ -136,11 +155,14 @@
 			chooseWharehouse: '',
 			listWharehouse: [],
 			isDisable: false,
-			cMemo: '',
+			poCMemo: CMemo,
 			listRdStyle: [],
 			chooseCRdCode: ''
 		},
 		methods: {
+			reset:function(){
+				$("#signature").jSignature("reset")
+			},
 			topScrollEvent:function(e){
 
 			    this.$refs.downDiv.scrollLeft=this.$refs.topDiv.scrollLeft;
@@ -156,8 +178,7 @@
 
 		    },
 		    downScrollEvent2:function(e){
-		    	this.$refs.topDiv2.scrollLeft=this.$refs.downDiv2.scrollLeft;
-			  
+		    	this.$refs.topDiv2.scrollLeft=this.$refs.downDiv2.scrollLeft; 
 		    },
 		    //扫码器调用的方法
 		    addiReceivedQTY: function(val) {
@@ -190,23 +211,30 @@
 		    	}
 		    },
 		    submitpp_Pomain: function() {
-		    	var that = this;
-		    	var submitData = this.pp_PodetailsArray.slice();
-		    	this.isDisable = true;
+				var that = this;
+				this.isDisable = true;
 		    	setTimeout(function(){
 		    		that.isDisable = false;
 		    	},1000);
+				
+				var signatureData = $("#signature").jSignature("getData", "svgbase64");
+		    					
+		    	var submitData = this.pp_PodetailsArray.slice();
+		    	
 		    	submitData = this.checkData(submitData);
 		    	if(!submitData) return;
 		    	if (submitData.length == 0) {
 		    		vue.$messagebox.alert("数据不能为空！", "错误");
 		    		return;
 		    	};
+
+		    	submitData[0].base64Str = signatureData[1];
+		    	console.log(submitData);
 		    	var url = getUrl()+"submitpp_Podetails";
 		    	axios.post(url,submitData)
 		    	.then(function(response){
-		    		localStorage.setItem("messageInfo",response.data);
 		    		makeJava.makeSuccessSound();
+		    		localStorage.setItem("messageInfo",response.data);
 		    		makeJava.jumpHtml("file:///android_asset/index.html");	
 		    	})
 		    	.catch(function(e){
@@ -242,7 +270,7 @@
 		    			return false;
 		    		}else {
 		    			data[i].cWhCode = this.chooseWharehouse;
-		    			data[i].cMemo = this.cMemo;
+		    			data[i].cMemo = this.poCMemo;
 		    			data[i].cRdCode = this.chooseCRdCode;
 		    		}
 		    	}
