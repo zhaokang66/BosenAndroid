@@ -17,7 +17,7 @@
 	}
 <!-- 	div::-webkit-scrollbar {
 		width:0px;
-		touch
+
 	} -->
 
     table{
@@ -26,7 +26,6 @@
         text-align: center;
 		
     }
-
     div.topDiv{
 
         overflow:scroll;
@@ -56,25 +55,30 @@
 	table.downTable2{
         width: 1300px;
         border-collapse:collapse;
-    }
-   
+    }   
 	input.condition{
 		width:100px;
 		height:20px;
 	}
-	
+	.fatherTab{
+		display: block;
+	}
+	.childTab{
+		display: none;
+
+	}
 </style>
 
 <body>
 <div id="app" v-cloak>
-	<div class="nav">
+	<div class="navBanner">
 		<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
 		<div class="nav_title">友成出/入库扫描系统</div>
 	</div>
 	<div style="margin-top: 60px;">
 		<input type="text" placeholder="请输入部门" class="condition" v-model="cDepName" />
 		<input type="text" placeholder="请输入生产编号" class="condition" v-model="productionCode" />
-		<mt-button size="small" type="primary" @click.native="selectPP_ProductPO">查询</mt-button>
+		<mt-button size="small" type="primary" @click.native="selectPP_ProductPO" :disabled="isDisable">查询</mt-button>
 	</div>
 	
 	<div style="border:1px solid black">
@@ -119,32 +123,37 @@
 	<br>
 	<div style="border:1px solid black">
 	<!--采购订单子表主表-->
-		<div  @scroll="topScrollEvent2" ref="topDiv2" class="topDiv">
-			<table class="topTable2" border="1">
-				<thead>
-					<tr>
-						<th style="width:100px">选择</th>
-						<th style="width:100px">生产计划号</th>
-						<th style="width:100px">存货编码</th>
-						<th style="width:100px">存货名称</th>
-						<th style="width:100px">存货代码</th>
-						<th style="width:100px">规格型号</th>
-						<th style="width:100px">开工日期</th>
-						<th style="width:100px">完工日期</th>
-						<th style="width:100px">单位</th>
-						<th style="width:100px">投产数量</th>
-						<th style="width:100px">累计入库数量</th>
-					</tr>
-				</thead>
-			</table>
+		<div class="clickTab">
+			<button @click="showHideTab('father')">父项选择</button>
+			<button @click="showHideTab('child')">子项选择</button>
 		</div>
-		
-		<!--采购订单子表子表div-->
-		<div ref="downDiv2" @scroll="downScrollEvent2" class="downDiv">
-			<table class="downTable2" border="1">
-				<tbody>
+		<div class="fatherTab" id="fatherTab">
+			<div  @scroll="topScrollEvent2" ref="topDiv2" class="topDiv">
+				<table class="topTable2" border="1">
+					<thead>
+						<tr>
+							<th style="width:100px">选择</th>
+							<th style="width:100px">生产计划号</th>
+							<th style="width:100px">存货编码</th>
+							<th style="width:100px">存货名称</th>
+							<th style="width:100px">存货代码</th>
+							<th style="width:100px">规格型号</th>
+							<th style="width:100px">开工日期</th>
+							<th style="width:100px">完工日期</th>
+							<th style="width:100px">单位</th>
+							<th style="width:100px">投产数量</th>
+							<th style="width:100px">累计入库数量</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+
+			<!--采购订单子表子表div-->
+			<div ref="downDiv2" @scroll="downScrollEvent2" class="downDiv">
+				<table class="downTable2" border="1">
+					<tbody>
 					<tr v-for="pp_Pomain in pp_PomainArray">
-						<td style="width:100px;text-align:center" ><input type="checkbox" v-model="pp_Pomain.checked" style="zoom:150%;"/></td>
+						<td style="width:100px;text-align:center" @click="checkPPMainBoxClick" class="PPMainInputTd"><input type="checkbox" v-model="pp_Pomain.checked" :mainId="pp_Pomain.mainId"/></td>
 						<td style="width:100px">{{pp_Pomain.productionCode}}</td>
 						<td style="width:100px">{{pp_Pomain.inventory.cInvCode}}</td>
 						<td style="width:100px">{{pp_Pomain.inventory.cInvName}}</td>
@@ -152,23 +161,59 @@
 						<td style="width:100px">{{pp_Pomain.inventory.cInvStd}}</td>
 						<td style="width:100px">{{pp_Pomain.dStartDate}}</td>
 						<td style="width:100px">{{pp_Pomain.dEndDate}}</td>
-						<td style="width:100px">{{pp_Pomain.inventory.computationUnit.cComunitName}}</td>	
+						<td style="width:100px">{{pp_Pomain.inventory.computationUnit.cComunitName}}</td>
 						<td style="width:100px">{{pp_Pomain.fQuantity}}</td>
 						<td style="width:100px">{{pp_Pomain.fInQuantity}}</td>
 
-					</tr>              
-				</tbody>
-			</table>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="childTab" id="childTab">
+			<label >用料车间：</label>
+			<select @change="filterPPDetails" id="department" disabled="true">
+				<option value="null"></option>
+				<option v-for="list in listdepartmen" :value="list.cDepCode">{{list.cDepCode}} {{list.cDepName}}</option>
+			</select>
+        	<div  @scroll="topScrollEvent2" ref="topDiv2" class="topDiv">
+				<table class="topTable2" border="1">
+					<thead>
+						<tr>
+							<th style="width: 100px;">选择</th>
+							<th style="width: 100px;">生产编号</th>
+							<th style="width: 100px;">存货编码</th>
+							<th style="width: 100px;">存货名称</th>
+							<th style="width: 100px;">用料车间</th>
+							<th style="width: 100px;">应领用量</th>
+							<th style="width: 100px;">已领用量</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+			<div ref="downDiv2" @scroll="downScrollEvent2" class="downDiv">
+				<table class="downTable2" border="1">
+					<tbody>
+						<tr v-for="pp_podetails in filterData">
+							<td style="width: 100px;"><input type="checkbox" v-model="pp_podetails.checked"></td>
+							<td style="width: 100px;">{{pp_podetails.cDefine22}}</td>
+							<td style="width: 100px;">{{pp_podetails.inventory.cInvCode}}</td>
+							<td style="width: 100px;">{{pp_podetails.inventory.cInvName}}</td>
+							<td style="width: 100px;">{{pp_podetails.cdepname}}</td>
+							<td style="width: 100px;">{{pp_podetails.fQuantity}}</td>
+							<td style="width: 100px;">{{pp_podetails.fOutQuantity}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>	
-	<mt-button size="small" type="primary" @click="jumpOderInstock" style="float:right" :disabled="isDisable">确定</mt-button>
+	<mt-button size="small" type="primary" @click="jumpOderInstock" style="float:right">确定</mt-button>
 	<mt-button size="small" type="primary" style="float:right">取消</mt-button>
 </div>
 
-
 </body>
-
-
 <!-- 先引入 Vue -->
 <script src="./js/vue/vue2.6.10.js"></script>
 <script src="./js/jquery/jquery3.4.1.js" ></script>
@@ -180,18 +225,20 @@
 
 <script>
 //设置axios的默认超时时间
-axios.defaults.timeout = 10000;		 
+axios.defaults.timeout = 10000;
     var vue=new Vue({
         el:"#app",
         data:{
             pp_ProductPOArray:[],
-            pp_PomainArray:[],	
+            pp_PomainArray:[],
             pp_PodetailsArray: [],
 			minEndId:-1,
 			isDisable: false,
 			cDepName: '',
 			productionCode: '',
-			poCMemo: ''
+			poCMemo: '',
+			listdepartmen: [],
+			filterData: []
         },
         methods:{
 			selectPP_ProductPO:function(){
@@ -200,10 +247,12 @@ axios.defaults.timeout = 10000;
 		    	setTimeout(function() {
 		    		that.isDisable = false;
 		    	},1000);
+				//初始化数组
+				this.pp_ProductPOArray = [];
+            	this.pp_PomainArray = [];
+            	this.pp_PodetailsArray = [];
+
 				var url = getUrl()+"listPP_ProductPO?bFinished=true&endId=-1&detailsFinshed=false&cDepName="+this.cDepName+"&productionCode="+this.productionCode;
-				// return;
-				this.pp_ProductPOArray=[]
-				this.pp_PomainArray=[]
 				this.doLoadMore(url)
 			},
             //加载更多
@@ -213,19 +262,19 @@ axios.defaults.timeout = 10000;
 					//alert(this.minEndId);
 					var url = getUrl()+"listPP_ProductPO?bFinished=true&detailsFinshed=false&endId="+this.minEndId+"&detailsFinshed=false&cDepName="+this.cDepName+"&productionCode="+this.productionCode;;
 					this.doLoadMore(url)
-					
+
 				}
                 this.loading = false;
-            },      
-			
-			
+            },
+
+
 		    topScrollEvent:function(e){
 			    this.$refs.downDiv.scrollLeft=this.$refs.topDiv.scrollLeft;
 
 		    },
 		    downScrollEvent:function(e){
 		    	this.$refs.topDiv.scrollLeft=this.$refs.downDiv.scrollLeft;
-			   
+
 		    },
 			topScrollEvent2:function(e){
 
@@ -233,7 +282,7 @@ axios.defaults.timeout = 10000;
 
 		    },
 		    downScrollEvent2:function(e){
-		    	this.$refs.topDiv2.scrollLeft=this.$refs.downDiv2.scrollLeft;	  
+		    	this.$refs.topDiv2.scrollLeft=this.$refs.downDiv2.scrollLeft;
 		    },
 		    doLoadMore:function(url){
 
@@ -249,32 +298,26 @@ axios.defaults.timeout = 10000;
 					console.log(jsonObject)
 					vue.minEndId=jsonObject[jsonObject.length-1].id;
 					// alert(response.data)
-					vue.pp_ProductPOArray=vue.pp_ProductPOArray.concat(jsonObject);					
+					vue.pp_ProductPOArray=vue.pp_ProductPOArray.concat(jsonObject);
 				}).catch(function (e) {
 					vue.$messagebox.alert(e, '错误');
 				});
 		    },
 			checkboxClick:function(e){
-					
 				var target=e.target;
 				if(e.target.getAttribute("class")=="inputTd"){
 					var target=e.target.firstChild
-					if(target.checked){
+					if(target.checked)
 						target.checked=""
-					}
 					else
 						target.checked="checked"
 				}
 				var ID=target.getAttribute("id");
 				if(target.checked){
-					var url=getUrl()+"listPP_Pomain?ID="+ID+"&detailsFinshed=false&bFinished=true";	
+					var url=getUrl()+"listPP_Pomain?ID="+ID+"&detailsFinshed=false&bFinished=true";
 					axios.get(url).then(function(response) {
-						vue.$refs.topDiv2.scrollLeft=0;			        
-						var jsonObject = response.data;						
-						for(each in jsonObject){
-							jsonObject[each].checked="true";
-							vue.selectPP_Podetails(jsonObject[each].mainId);
-						}
+						vue.$refs.topDiv2.scrollLeft=0;
+						var jsonObject = response.data;
 						vue.pp_PomainArray=vue.pp_PomainArray.concat(jsonObject);
 					// vue.pp_PomainSelection=vue.pp_PomainSelection.concat(jsonObject);
 					}).catch(function (e) {
@@ -289,66 +332,109 @@ axios.defaults.timeout = 10000;
 					}
 				}
 			},
-			jumpOderInstock:function(){
-				window.localStorage.clear();
-				var that = this;
-		    	this.isDisable = true;
-		    	this.poCMemo = (this.pp_ProductPOArray.length == 1) ? this.poCMemo=this.pp_ProductPOArray[0].cMemo : '';
-		    	var submitData = this.pp_PodetailsArray.slice();
-		    	setTimeout(function() {
-		    		that.isDisable = false;
-		    	},1000);
-				for (i in this.pp_PomainArray) {
-					if (!this.pp_PomainArray[i].checked) {
-						for (var j = 0; j < submitData.length; j++) {
-							if (submitData[j].mainId == this.pp_PomainArray[i].mainId) {
-								submitData.splice(j,1);
-								j--;
-							}
+			checkPPMainBoxClick: function(e) {
+				var target = e.target;
+				if (e.target.getAttribute("class")=="PPMainInputTd") {
+					var target=e.target.firstChild
+					if(target.checked)
+						target.checked="";
+					else
+						target.checked="checked";
+				}
+				var mainId = target.getAttribute("mainId");
+				if (target.checked) {
+					var url = getUrl()+"listPP_Podetails?mainId="+mainId+"&detailsFinshed=false";
+					axios.get(url).then(function(response){
+						var jsonObject = response.data;
+						for(each in jsonObject) {
+							jsonObject[each].checked = "true";
+						}
+						vue.pp_PodetailsArray = vue.pp_PodetailsArray.concat(jsonObject);
+						console.log(vue.pp_PodetailsArray)
+						vue.filterData = vue.pp_PodetailsArray.slice();
+
+					}).catch(function (e) {
+						vue.$messagebox.alert(e, '错误');
+					});
+				}else {
+					for (var i = 0; i < vue.pp_PodetailsArray.length; i++) {
+						if (vue.pp_PodetailsArray[i].mainId == mainId) {
+							vue.pp_PodetailsArray.splice(i,1);
+							i--;
 						}
 					}
 				}
-
+			},
+			showHideTab: function(tabName,e) {
+				if (tabName == 'father') {
+					$("#fatherTab").css("display","block");
+					$("#childTab").css("display","none");
+				}else {
+					$("#fatherTab").css("display","none");
+					$("#childTab").css("display","block");
+				}
+			},
+			//根据组别过滤子件，
+			filterPPDetails: function() {
+				this.filterData = [];
+				var cdepcode = $('#department option:selected').val();
+				if (cdepcode == 'null') {
+					this.filterData = vue.pp_PodetailsArray;
+				}else {
+					for (var i = 0; i < vue.pp_PodetailsArray.length; i++) {
+						if (this.pp_PodetailsArray[i].cdepcode == cdepcode) {
+							this.filterData.push(this.pp_PodetailsArray[i]);
+						}
+					}
+				}
+			},
+			jumpOderInstock:function() {
+				window.localStorage.clear();
+		    	this.poCMemo = (this.pp_ProductPOArray.length == 1) ? this.poCMemo=this.pp_ProductPOArray[0].cMemo : '';
+		    	var submitData = this.pp_PodetailsArray.slice();
+				for (var i = 0; i < submitData.length; i++) {
+					if (!submitData.checked) {
+						submitData.splice(i,1);
+						i--;
+					}
+				}
 				console.log(submitData)
 				if (submitData.length == 0) {
 					vue.$messagebox.alert("请选择所属子项！", '错误');
 					return;
 				}
-
 				if (typeof(Storage) !== "undefined") {
 					localStorage.setItem("pp_PodetailsArray",JSON.stringify(submitData));
-					makeJava.jumpHtml("file:///android_asset/materialOutStockByOrder.html");				
+					localStorage.setItem("poCMemo",JSON.stringify(this.poCMemo));
+					makeJava.jumpHtml("file:///android_asset/materialOutStockByOrder.html");
 				} else {
     				alert("Sorry, your browser does not support Web Storage...")
 				}
-			
-			},
-			selectPP_Podetails: function(mainId) {	
-				var url = getUrl()+"listPP_Podetails?mainId="+mainId+"&detailsFinshed=false";	
-				axios.get(url).then(function(response){
-					var jsonObject = response.data;
-						for(each in jsonObject) {
-							jsonObject[each].checked = "true";
-						}
-					vue.pp_PodetailsArray = vue.pp_PodetailsArray.concat(jsonObject);
-
-				}).catch(function (e) {
-					vue.$messagebox.alert(e, '错误');
-				});	
 			}
         },
-        watch: {
-        	pp_PomainArray : function(val) {
-        		if (val != []) {
-        			this.isDisable = false;
-        		}else {
-        			this.isDisable = true;
-        		}
-        	}
-        },
-		
-
+		created: function () {
+			axios.get(getUrl()+"getDepartmentList")
+					.then(function(response){
+						var departmentList = response.data;
+						for (var i in departmentList) {
+							vue.listdepartmen.push(departmentList[i]);
+						}
+					})
+					.catch(function(e){
+						vue.$messagebox.alert(e, '错误');
+					});
+		},
+		watch: {
+        	//子件数组为空则禁用下拉选择框
+			pp_PodetailsArray: {
+				handler(newVal, objVal) {
+					if (newVal.length == 0) {
+						$('#department').attr("disabled",true);
+					}else {
+						$('#department').attr("disabled",false);
+					}
+				}
+			}
+		}
     })
-
-
 </script>
