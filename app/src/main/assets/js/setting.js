@@ -1,4 +1,5 @@
-var url = "http://192.168.43.135:8082/"
+var url = "http://192.168.3.140:8084/"
+
 function getUrl() {
 	return url;
 }

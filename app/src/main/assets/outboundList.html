@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
     <!-- 引入样式 -->
     <link rel="stylesheet" href="./css/mint/style.min.css">
     <link rel="stylesheet" type="text/css" href="./css/style.css">
@@ -49,25 +50,33 @@
     	font-size: 26px;
     	opacity: 0.8;
     }
+	div.downDiv{
+
+		overflow:scroll;
+		height:450px;
+		-webkit-overflow-scrolling: touch;
+		border: 1px solid black;
+	}
     .title{
     	position: fixed;
     	top: 50px;
     	left: 120px;
     }
     .topDiv{
-    	margin-top: 100px;
+    	margin-top: 85px;
     }
 </style>
 <div id="app" v-cloak>
-	<div class="nav">
+	<div class="navBanner">
 		<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
 		<div class="nav_title">友成出/入库扫描系统</div>
 	</div>
-	<h3 class="title">材料出库单据列表</h3>
-	<div class="topDiv" id="topDiv">
+	><h3 class="title">材料出库单据列表</h3>
+	<div  @scroll="topScrollEvent" ref="topDiv" class="topDiv">
 		<table border="1">
 			<thead>
 				<tr>
+					<th style="width: 100px;">序号</th>
 					<th style="width: 100px;">仓库</th>
 					<th style="width: 100px;">出库日期</th>
 					<th style="width: 100px;">出库单号</th>
@@ -85,10 +94,15 @@
 			</thead>
 		</table>
 	</div>
-	<div class="downDiv" id="downDiv">
-		<table border="1">
+	<div  ref="downDiv" @scroll="downScrollEvent" class="downDiv">
+		<table border="1"
+			   v-infinite-scroll="loadMore"
+			   infinite-scroll-disabled="loading"
+			   infinite-scroll-distance="50"
+		>
 			<tbody>
-				<tr v-for="data in outboundList" style="text-align: center;">
+				<tr v-for="(data,index) in outboundList" style="text-align: center;">
+					<td style="width: 100px;">{{index+1}}</td>
 					<td style="width: 100px;">{{data.cWhName}}</td>
 					<td style="width: 100px;">{{data.dDate}}</td>
 					<td style="width: 100px;">{{data.cCode}}</td>
@@ -123,7 +137,8 @@
 	var vue = new Vue({
 		el: "#app",
 		data: {
-			outboundList: []
+			outboundList: [],
+			minEndId: -1
 		},
 		methods: {
 			showImage: function(val) {
@@ -133,23 +148,63 @@
 				$("#img").attr("src",getUrl()+"img/signature/OutboundSignature/"+val+".svg")
 
 			},
+			topScrollEvent:function(e){
+
+				this.$refs.downDiv.scrollLeft=this.$refs.topDiv.scrollLeft;
+
+			},
+			downScrollEvent:function(e){
+				this.$refs.topDiv.scrollLeft=this.$refs.downDiv.scrollLeft;
+
+			},
 			hideImage: function() {
 				$('#signature').css("display","none");
 				$("#downDiv").css("opacity",1);
 				$("#topDiv").css("opacity",1);
 			},
 			deleteList: function(id) {
-				axios.get(getUrl()+"deleteList?id="+id)
-				.then(function(response) {
-					vue.$messagebox.alert(response.data, "提示");
+				vue.$messagebox.confirm('确定删除此出库单吗？','警告')
+				.then(function (action) {
+					axios.get(getUrl()+"deleteList?id="+id)
+					.then(function(response) {
+						vue.$messagebox.alert(response.data, "提示");
+						setTimeout(function(){
+							location.reload();
+						},2000);
+					})
+					.catch(function(e) {
+						vue.$messagebox.alert(e, "错误");
+					})
 				})
-				.catch(function(e) {
-					vue.$messagebox.alert(e, "错误");
-				})
+			},
+			loadMore: function () {
+				this.loading = true;
+				if (this.minEndId != -1) {
+					var url = getUrl()+"rdrecordList?cBusType=领料&end="+this.minEndId;
+					xios.get(url)
+							.then(function(response){
+								console.log(response.data);
+								var jsonObject = response.data;
+								if (jsonObject.length == 0) {
+									return;
+								}
+								for (each in jsonObject) {
+									jsonObject[each].chcked = "";
+								}
+								vue.minEndId=jsonObject[jsonObject.length-1].iD;
+								vue.outboundList = vue.outboundList.concat(jsonObject);
+							})
+							.catch(function(e){
+								vue.$messagebox.alert(e, '错误');
+							});
+				}
+				this.loading = false;
 			}
 		},
 		created: function() {
-			axios.get(getUrl()+"rdrecordList?cBusType=领料")
+			var url = getUrl()+"rdrecordList?cBusType=领料&endId=-1";
+			// var url = getUrl()+"rdrecordList?cBusType=领料";
+			axios.get(url)
 			.then(function(response){
 				console.log(response.data);
 				var jsonObject = response.data;
@@ -159,6 +214,7 @@
 				for (each in jsonObject) {
 					jsonObject[each].chcked = "";
 				}
+				vue.minEndId=jsonObject[jsonObject.length-1].iD;
 				vue.outboundList = vue.outboundList.concat(jsonObject);
 			})
 			.catch(function(e){

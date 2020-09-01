@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity  implements BarcodeReader.Tr
     private SoundPool soundPool;
     private int sucessSoundId;
     private int failSoundId;
+    private int noticeSoundId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +56,9 @@ public class MainActivity extends AppCompatActivity  implements BarcodeReader.Tr
         soundPool = new SoundPool(5, AudioManager.STREAM_ALARM, 5);
         sucessSoundId = soundPool.load(this, R.raw.sucess, Integer.MAX_VALUE);
 
-                failSoundId = soundPool.load(this, R.raw.fail, Integer.MAX_VALUE);
+        failSoundId = soundPool.load(this, R.raw.fail, Integer.MAX_VALUE);
+
+        noticeSoundId  = soundPool.load(this, R.raw.notice, Integer.MAX_VALUE);
 
         webView = (WebView) findViewById(R.id.wv);
         WebSettings webSettings = webView.getSettings();
@@ -72,7 +75,7 @@ public class MainActivity extends AppCompatActivity  implements BarcodeReader.Tr
         webView.addJavascriptInterface(new WebAppInterface(this), "makeJava");
         mLoadFinished = false;
 
-        webView.loadUrl("file:///android_asset/index.html");
+        webView.loadUrl("file:///android_asset/login.html");
 
 
         /*findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
@@ -210,6 +213,9 @@ public class MainActivity extends AppCompatActivity  implements BarcodeReader.Tr
     }
     public void makeFailSound(){
         soundPool.play(failSoundId, 0.8f, 0.8f, 1, 0, 1);
+    }
+    public void makeNoticeSound(){
+        soundPool.play(noticeSoundId, 0.8f, 0.8f, 1, 0, 1);
     }
 
 

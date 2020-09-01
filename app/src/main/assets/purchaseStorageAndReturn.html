@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
 	<!-- 引入样式 -->
 	<link rel="stylesheet" href="./css/mint/style.min.css">
 	<link rel="stylesheet" type="text/css" href="./css/style.css">
@@ -17,7 +18,7 @@ div::-webkit-scrollbar {
 }
 <!-- 	div::-webkit-scrollbar {
 	width:0px;
-	touch
+
 	} -->
 
 	table{
@@ -67,7 +68,7 @@ div::-webkit-scrollbar {
 <body>
 	<div id="app" v-cloak>
 
-		<div class="nav">
+		<div class="navBanner">
 			<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
 			<div class="nav_title">友成出/入库扫描系统</div>
 		</div>
@@ -310,8 +311,10 @@ var vue=new Vue({
 				}
 				console.log(submitData);
 				if (typeof(Storage) !== "undefined") {
-					localStorage.setItem("pO_PODetailsArray", JSON.stringify(submitData))
-					makeJava.jumpHtml("file:///android_asset/purchaseInStockByOrder.html")
+					localStorage.setItem("pO_PODetailsArray", JSON.stringify(submitData));
+					//定义提交页面的入库类型    0=>采购入库 1=>采购入库退库
+					localStorage.setItem("genre","1");
+					makeJava.jumpHtml("file:///android_asset/purchaseInStockByOrder.html");
 				} else {
     				alert("Sorry, your browser does not support Web Storage...")
 				}

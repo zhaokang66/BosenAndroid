@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
     <!-- 引入样式 -->
     <link rel="stylesheet" href="./css/mint/style.min.css">
     <link rel="stylesheet" type="text/css" href="./css/style.css">
@@ -15,7 +16,7 @@
         display: none;
 	}
 	#app{
-		min-width: 1200px;
+		min-width: 1000px;
 	}
 	table{
         word-break:break-all;
@@ -39,14 +40,24 @@
     td,th{
     	text-align: center;
     }
+	.sign{
+		position: fixed;
+		top: 400px;
+		/*height: 303px;*/
+		/*width: 100%;*/
+		/*margin: 10px 2px;*/
+		/*!*!*right: 5px;*!*!*/
+
+	}
+
 	
 </style>	
 <div id="app" v-cloak>
-	<div class="nav">
+	<div class="navBanner">
 		<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
 		<div class="nav_title">友成出/入库扫描系统</div>
 	</div>
-	<div style="border:1px solid black;margin-top: 60px;">
+	<div style="border:1px solid black;margin-top:60px;height: 336px;overflow: scroll">
 		<select v-model="chooseWharehouse">
 			<option value="">选择仓库</option>
 			<option :value="list.cWhCode" v-for="list in listWharehouse">{{list.cWhCode}} {{list.cWhName}}</option>
@@ -65,15 +76,14 @@
 						<th style="width:100px">序号</th>
 						<th style="width:100px">生产计划号</th>
 						<th style="width:100px">存货编码</th>
-						<th style="width:100px">本次出库数量</th>
-						<th style="width:100px">单价</th>
-						<th style="width:100px">已出库数量</th>
-						<th style="width:100px">待出库数量</th>
-						<th style="width:100px">数量</th>
+						<th style="width:100px">本次领料数量</th>
+						<th style="width:100px">本次需领料数量</th>
+						<th style="width:100px">已领用量</th>
+						<th style="width:100px">库存</th>
+						<th style="width:100px">应领用量</th>
 						<th style="width:100px">存货名称</th>
 						<th style="width:100px">规格型号</th>
 						<th style="width:100px">单位</th>
-						<th style="width:100px">金额</th>
 						
 						
 					</tr>
@@ -93,34 +103,32 @@
 						</td>
 						<td style="width:100px">{{pp_Podetails.inventory.cInvCode}}</td>
 						<td style="width:100px" align="center">
-							<input type="number" style="width: 50px;" :value="pp_Podetails.nowiReceivedQTY" v-model.number="pp_Podetails.nowfOutQuantity" @change="bgColor(index)">
+							<input type="number" style="width: 50px;" :value="pp_Podetails.nowfOutQuantity" v-model.number="pp_Podetails.nowfOutQuantity" @change="bgColor(index)">
 						</td>
-						<td style="width:100px">
-							<input type="number" :value="pp_Podetails.iUnitCost" v-model.number="pp_Podetails.iUnitCost" style="width: 98%;" @change="sumPrice(index)">
-						</td>
+						<td style="width:100px">{{pp_Podetails.needOutNumber}}</td>
 						<td style="width:100px">{{pp_Podetails.fOutQuantity}}</td>
-						<td style="width:100px">{{pp_Podetails.fQuantity - pp_Podetails.fOutQuantity}}</td>
+						<td style="width:100px">{{pp_Podetails.inStock}}</td>
 						<td style="width:100px">{{pp_Podetails.fQuantity}}</td>
 						<td style="width:100px">{{pp_Podetails.inventory.cInvName}}</td>
 						<td style="width:100px">{{pp_Podetails.inventory.cInvStd}}</td>
 						<td style="width:100px">
 						{{pp_Podetails.inventory.computationUnit.cComunitName}}</td>
-						
-						<td style="width:100px">{{pp_Podetails.iPrice}}</td>	
+
 						
 											
-					</tr>              
+					</tr>
 				</tbody>	
 			</table>
 		</div>
 		<br>
 		<br>
-		<div>签名：</div>
-		<div id="signature" style="border:1px dotted black"></div>
-		<div>
-			<mt-button size="small " type="primary" @click.native="reset">重置</mt-button>
-			<mt-button size="small " type="primary" @click.native="submitpp_Pomain" :disabled="isDisable">提交</mt-button>
-
+		<div class="sign">
+			<div>签名：</div>
+			<div id="signature" style="border:1px dotted black"></div>
+			<div>
+				<mt-button size="small " type="primary" @click.native="reset">重置</mt-button>
+				<mt-button size="small " type="primary" @click.native="submitpp_Pomain" :disabled="isDisable">提交</mt-button>
+			</div>
 		</div>
 	</div>
 </div>
@@ -138,15 +146,25 @@
 	<script src="./js/setting.js"></script>
 <script>
 	$(document).ready(function() {
-			$("#signature").jSignature()
+		var param = {
+			width: '340px',//签名区域的宽
+			height: '152px',//签名区域的高
+			cssclass: 'zx11',//画布的类 可以写自定义的样式
+			UndoButton:true,//撤销按钮的状态 这个按钮的样式修改要去jSignature.js文件中去找
+			signatureLine: false,//去除默认画布上那条横线
+			lineWidth: '1' //画笔的大小
+		}
+			$("#signature").jSignature(param)
 		})
 	var pp_PodetailsArray = JSON.parse(localStorage.getItem("pp_PodetailsArray"));
-	var CMemo = JSON.parse(localStorage.getItem("poCMemo"));
+	var CMemo = localStorage.getItem("poCMemo");
+	var genre = localStorage.getItem("genre");
 	//初始化
 	for (var i = 0; i< pp_PodetailsArray.length; i++) {
 		pp_PodetailsArray[i].nowfOutQuantity = 0;
 		pp_PodetailsArray[i].iUnitCost = 0;
 		pp_PodetailsArray[i].iPrice = 0;
+		pp_PodetailsArray[i].inStock = 0;
 	}
 	var vue = new Vue({
 		el: "#app",
@@ -157,7 +175,7 @@
 			isDisable: false,
 			poCMemo: CMemo,
 			listRdStyle: [],
-			chooseCRdCode: ''
+			chooseCRdCode: '202'
 		},
 		methods: {
 			reset:function(){
@@ -189,9 +207,20 @@
 		    		}
 		    	}
 		    	if (temp.length > 1) {
-		    		vue.$messagebox.alert("记录中有至少两条相同的存货编码，请在第"+temp.join(", ")+"行手动输入出库数量！");
+		    		var res = 0;
+		    		for (var i = 0; i< temp.length; i++) {
+		    			if (this.pp_PodetailsArray[temp[i]].nowfOutQuantity < (this.pp_PodetailsArray[temp[i]].fQuantity - this.pp_PodetailsArray[temp[i]].fOutQuantity)){
+							this.pp_PodetailsArray[temp[i]].nowfOutQuantity++;
+							this.bgColor(temp[i]);
+							res = 1;
+							break;
+						}
+					}
+		    		if (res == 0) {
+						vue.$messagebox.alert('材料编码为'+val+'的待出库数量为0');
+					}
 		    	} else if (temp.length == 1) {
-		    		this.pp_Podetails[temp[0]].nowfOutQuantity++;
+		    		this.pp_PodetailsArray[temp[0]].nowfOutQuantity++;
 		    		this.bgColor(temp[0]);
 
 		    	}else {
@@ -216,22 +245,17 @@
 		    	setTimeout(function(){
 		    		that.isDisable = false;
 		    	},1000);
-				
 				var signatureData = $("#signature").jSignature("getData", "svgbase64");
-		    					
 		    	var submitData = this.pp_PodetailsArray.slice();
-		    	
 		    	submitData = this.checkData(submitData);
 		    	if(!submitData) return;
 		    	if (submitData.length == 0) {
 		    		vue.$messagebox.alert("数据不能为空！", "错误");
 		    		return;
-		    	};
-
+		    	}
 		    	submitData[0].base64Str = signatureData[1];
-		    	console.log(submitData);
 		    	var url = getUrl()+"submitpp_Podetails";
-		    	axios.post(url,submitData)
+		    	axios.post(url, submitData)
 		    	.then(function(response){
 		    		makeJava.makeSuccessSound();
 		    		localStorage.setItem("messageInfo",response.data);
@@ -242,7 +266,9 @@
 		    		vue.$messagebox.alert(e, '错误');
 		    	});
 		    },
+
 		    //计算金额
+
 		    sumPrice: function(index) {
 		    	var a = this.pp_PodetailsArray[index].nowfOutQuantity;
 		    	var b = this.pp_PodetailsArray[index].iUnitCost;
@@ -265,21 +291,46 @@
 		    		if (data[i].nowfOutQuantity == 0) {
 		    			data.splice(i, 1);
 		    			i--;
-		    		}else if (data[i].nowfOutQuantity > (data[i].fQuantity - data[i].fOutQuantity)) {
-		    			vue.$messagebox.alert("第"+index+"条订单的本次出库数量不能大于出库上限范围！");
+		    		}else if (genre == "0" && (data[i].nowfOutQuantity > (data[i].fQuantity - data[i].fOutQuantity) || data[i].nowfOutQuantity < 0) || data[i].nowfOutQuantity > data[i].inStock) {
+		    			vue.$messagebox.alert("第"+index+"条订单的本次领料数量不能大于库存、生产需求量和小于0！");
 		    			return false;
-		    		}else {
+		    		}else if(genre == "1" && (data[i].nowfOutQuantity > 0 || -data[i].nowfOutQuantity > data[i].fOutQuantity )) {
+						vue.$messagebox.alert("第"+index+"条订单的本次退库数量不能大于已领料数量和大于0！");
+						return false;
+					} else {
 		    			data[i].cWhCode = this.chooseWharehouse;
 		    			data[i].cMemo = this.poCMemo;
-		    			data[i].cRdCode = this.chooseCRdCode;
+						data[i].cRdCode = this.chooseCRdCode;
+						data[i].librarian = JSON.parse(localStorage.getItem('userInfo')).username;
+						data[i].taskId = localStorage.getItem('id') == null ? "" :localStorage.getItem('id')
 		    		}
 		    	}
 		    	return data;
-		    }
+		    },
+			gerInStock: function (cWhCode, cInvCode, index) {
+				axios.get(getUrl() +
+						'getInStock?cWhCode=' + cWhCode +
+						'&cInvCode=' + cInvCode)
+						.then(function (response) {
+							console.log(response.data)
+							if (response.data == '' || response.data == null) {
+								vue.pp_PodetailsArray[index].inStock = 0
+							}else {
+								vue.pp_PodetailsArray[index].inStock = response.data
+							}
+						})
+						.catch(function (e) {
+							vue.$messagebox.alert(e,'错误')
+						})
+			}
 		},
 		watch: {
 			chooseWharehouse: function(val) {
 				this.chooseWharehouse = val;
+				console.log()
+				for(var i = 0; i < vue.pp_PodetailsArray.length; i++) {
+					vue.gerInStock(val,vue.pp_PodetailsArray[i].inventory.cInvCode, i)
+				}
 			}
 		},
 		//获取仓库信息
@@ -300,7 +351,6 @@
 		   	.then(function(response){
 		   		var cRdStyleList = response.data;
 	   			for (var i in cRdStyleList) {
-	   				// console.log(vue.listWharehouse)
 	   				vue.listRdStyle.push(cRdStyleList[i]);
 		   		}
 	    	})
@@ -319,6 +369,9 @@
 						list_page.childNodes[i].style.backgroundColor = "green";    	
 				}
 			});
+		},
+		destroyed: function () {
+			window.localStorage.removeItem('id')
 		}
 	})
 </script>	

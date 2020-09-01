@@ -1,0 +1,5 @@
+var url = "http://192.168.43.121:8084/"
+
+function getUrl() {
+	return url;
+}

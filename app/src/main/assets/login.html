@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="./css/mint/style.min.css">
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+
+</head>
+<style>
+    body {
+        background-color: #2b669a;
+    }
+    .loginContainer {
+        width: 90%;
+        height: 180px;
+        margin: 10px auto;
+        border: 1px solid gray;
+    }
+    .loginHeader {
+        width: 70%;
+        height: 50px;
+        margin: 150px auto 20px auto;
+        text-align: center;
+        font-size: 25px;
+        color: #fff;
+        font-family: '新宋体';
+        font-weight: bold;
+    }
+    .userName {
+        width: 90%;
+        height: 50px;
+        margin: 10px auto;
+    }
+    .password {
+        width: 90%;
+        height: 50px;
+        margin: 10px auto;
+    }
+    input {
+        width: 70%;
+        height: 25px;
+    }
+    button {
+        width: 25%;
+        height: 25px;
+        margin: 0 auto;
+        display: block;
+        font-size: 16px;
+    }
+</style>
+<div id="app" v-cloak>
+
+    <div class="loginHeader">
+        <p>友成出/入库扫描系统</p>
+    </div>
+    <div class="loginContainer">
+
+            <div class="userName">
+                <label for="id">账号id：</label>
+                <input type="text" v-model.number="loginData.id" name="id" placeholder="请输入登录账号id">
+            </div>
+            <div class="password">
+                <label for="password">密  &nbsp;&nbsp;码：</label>
+                <input type="password" v-model="loginData.password" name="password" placeholder="请输入密码">
+            </div>
+            <button @click.naive="login">提交</button>
+
+    </div>
+</div>
+
+<!-- 先引入 Vue -->
+<script src="./js/vue/vue2.6.10.js"></script>
+<script src="./js/jquery/jquery3.4.1.js"></script>
+<!-- 引入组件库 -->
+<script src="./js/mint/index.js"></script>
+<!--引入axios-->
+<script src="./js/vue/axios.min.js"></script>
+<script src="./js/setting.js"></script>
+<script type="text/javascript">
+
+    var vue = new Vue({
+        el: "#app",
+        data: {
+            loginData: {
+                id: 5,
+                password: '123456'
+            }
+        },
+        methods: {
+            login: function () {
+                if (this.loginData.id == 0 || this.loginData.password == '') {
+                    return alert('请输入账号id或者密码！')
+                }
+                var url = getUrl() + "user/login";
+                axios.post(url, this.loginData)
+                    .then(function (response) {
+                        if (response.data == null || response.data == '') {
+                            return alert('用户名或者密码错误！')
+                        }
+                        localStorage.setItem('userInfo', JSON.stringify(response.data[0]))
+                        localStorage.setItem("messageInfo", '登录成功！')
+                        makeJava.jumpHtml("file:///android_asset/index.html")
+                    })
+                    .catch(function (e) {
+                        alert(e, '错误');
+                    });
+            },
+
+        }
+
+    })
+</script>

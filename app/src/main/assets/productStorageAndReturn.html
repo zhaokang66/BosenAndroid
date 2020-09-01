@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
     <!-- 引入样式 -->
     <link rel="stylesheet" href="./css/mint/style.min.css">
     <link rel="stylesheet" type="text/css" href="./css/style.css">
@@ -17,7 +18,7 @@
 	}
 <!-- 	div::-webkit-scrollbar {
 		width:0px;
-		touch
+
 	} -->
 
     table{
@@ -67,7 +68,7 @@
 
 <body>
 <div id="app" v-cloak>
-	<div class="nav">
+	<div class="navBanner">
 		<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
 		<div class="nav_title">友成出/入库扫描系统</div>
 	</div>
@@ -270,7 +271,7 @@ axios.defaults.timeout = 10000;
 				}
 				var ID=target.getAttribute("id");
 				if(target.checked){
-					var url = getUrl()+"listPP_Pomain?ID="+ID+"&bFinished=true&detailsFinshed=true";
+					var url = getUrl()+"listPP_Pomain?ID="+ID+"&bFinished=true&detailsFinshed=true&productionCode=" + this.productionCode;
 					axios.get(url).then(function(response) {
 					vue.$refs.topDiv2.scrollLeft=0;			        
 					var jsonObject = response.data;						
@@ -297,7 +298,7 @@ axios.defaults.timeout = 10000;
 				this.poCMemo = (this.pp_ProductPOArray.length == 1) ? this.poCMemo=this.pp_ProductPOArray[0].cMemo : '';
 				var submitData = vue.pp_PomainArray.slice();
 				for (var i = 0; i < submitData.length; i++) {
-					if (!submitData[i].checked) {
+					if (!submitData[i].checked || submitData[i].fInQuantity == 0) {
 						submitData.splice(i, 1);
 						i--;
 					}
@@ -308,7 +309,9 @@ axios.defaults.timeout = 10000;
 				}
 				if (typeof(Storage) !== "undefined") {
 					localStorage.setItem("poCMemo",JSON.stringify(this.poCMemo));
-					localStorage.setItem("pp_PomainArray", JSON.stringify(submitData))
+					localStorage.setItem("pp_PomainArray", JSON.stringify(submitData));
+					//定义提交页面的入库类型    0=>入库 1=>入库退库
+					localStorage.setItem("genre","1");
 					makeJava.jumpHtml("file:///android_asset/productInStockByOrder.html")
 
     

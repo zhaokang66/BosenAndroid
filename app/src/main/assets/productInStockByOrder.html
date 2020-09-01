@@ -1,6 +1,7 @@
-'<!DOCTYPE html>
+<!DOCTYPE html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
     <!-- 引入样式 -->
     <link rel="stylesheet" href="./css/mint/style.min.css">
     <link rel="stylesheet" type="text/css" href="./css/style.css">
@@ -42,18 +43,18 @@
 	
 </style>	
 <div id="app" v-cloak>
-	<div class="nav">
+	<div class="navBanner">
 		<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
 		<div class="nav_title">友成出/入库扫描系统</div>
 	</div>
-	<div style="border:1px solid black;margin-top: 30px;">
+	<div style="border:1px solid black;margin-top: 60px;">
 		<select v-model="chooseWharehouse">
 			<option value="">选择仓库</option>
 			<option :value="list.cWhCode" v-for="list in listWharehouse">{{list.cWhCode}} {{list.cWhName}}</option>
 		</select>
 		<select v-model="chooseCRdCode">
 			<option value="">选择入库类别</option>
-			<option :value="list.cRdCode" v-for="list in listRdStyle">{{list.cRdCode}} {{list.cRdName}}</option>
+			<option :value="list.cRdCode"  v-for="list in listRdStyle">{{list.cRdCode}} {{list.cRdName}}</option>
 		</select>
 		<label>备注：</label>
 		<input type="text" name="" :value="poCMemo" v-model="poCMemo">
@@ -128,7 +129,7 @@
 <script>
 	var pp_PomainArray = JSON.parse(localStorage.getItem("pp_PomainArray"));
 	var CMemo = JSON.parse(localStorage.getItem("poCMemo"));
-
+	var genre = localStorage.getItem("genre");
 	//初始化
 	for (var i = 0; i< pp_PomainArray.length; i++) {
 		pp_PomainArray[i].nowiReceivedQTY = 0;
@@ -144,7 +145,7 @@
 			isDisable: false,
 			poCMemo: CMemo,
 			listRdStyle: [],
-			chooseCRdCode: ''
+			chooseCRdCode: '102'
 		},
 		methods: {
 			topScrollEvent:function(e){
@@ -241,10 +242,13 @@
 		    		if (data[i].nowiReceivedQTY == 0){
 		    			data.splice(i,1);
 		    			i--;
-		    		}else if (data[i].nowiReceivedQTY > (data[i].fQuantity - data[i].fInQuantity)) {
-		    			vue.$messagebox.alert("第"+index+"条订单的本次入库数量不能大于入库上限范围！");
+		    		}else if (genre == "0" && (data[i].nowiReceivedQTY > (data[i].fQuantity - data[i].fInQuantity) || data[i].nowiReceivedQTY < 0)) {
+		    			vue.$messagebox.alert("第"+index+"条订单的本次入库数量不能大于入库上限范围和小于0！");
 		    			return false;
-		    		}else {
+		    		}else if(genre == "1" && (data[i].nowiReceivedQTY > 0 || data[i].nowiReceivedQTY < -(data[i].fInQuantity))) {
+						vue.$messagebox.alert("第"+index+"条订单的本次入库退库数量不能小于已入库数量上限范围和小于0！");
+						return false;
+					} else {
 		    			data[i].cWhCode = this.chooseWharehouse;
 		    			data[i].cMemo = this.poCMemo;
 		    			data[i].cRdCode = this.chooseCRdCode;

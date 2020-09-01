@@ -44,4 +44,10 @@ public class WebAppInterface {
         final MainActivity mainActivity=(MainActivity)mContext;
         mainActivity.makeFailSound();
     }
+
+    @JavascriptInterface
+    public void makeNoticeSound(){
+        final MainActivity mainActivity=(MainActivity)mContext;
+        mainActivity.makeNoticeSound();
+    }
 }

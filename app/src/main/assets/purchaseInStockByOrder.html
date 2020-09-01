@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
     <!-- 引入样式 -->
     <link rel="stylesheet" href="./css/mint/style.min.css">
     <link rel="stylesheet" type="text/css" href="./css/style.css">
@@ -45,7 +46,7 @@
 <div id="app" v-cloak>
 
 	
-		<div class="nav">
+		<div class="navBanner">
 			<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
 			<div class="nav_title">友成出/入库扫描系统</div>
 		</div>
@@ -82,7 +83,7 @@
 
 			<table class="downTable2" border="1">
 				<tbody  id="list_info">
-					<tr v-for="(pO_PODetails,,index) in pO_PODetailsArray" class="red">
+					<tr v-for="(pO_PODetails,index) in pO_PODetailsArray" class="red">
 						<td style="width:100px">{{index+1}}</td>
 						<td style="width:100px" align="center"  >
 							<select  v-model="pO_PODetails.cWhCode" style="width: 98%;" >
@@ -120,6 +121,7 @@
 <script src="./js/setting.js"></script>
 <script type="text/javascript">
 	var pO_PODetailsArray = JSON.parse(localStorage.getItem("pO_PODetailsArray"));
+	var genre = localStorage.getItem("genre");
 	var temp = pO_PODetailsArray.slice();
 	for (var i = 0; i< pO_PODetailsArray.length; i++) {
 		pO_PODetailsArray[i].nowiReceivedQTY = 0;
@@ -182,10 +184,13 @@
 		    				vue.$messagebox.alert("第"+index+"条数据的仓库不能为空！","错误");
 		    				return false;
 		    			}
-		    			if (data[i].nowiReceivedQTY > (data[i].iQuantity -data[i].iReceivedQTY)) {
-		    				vue.$messagebox.alert("第"+index+"条数据的本次入库数量不能大于入库上限！","错误");
+		    			if (genre == '1' && data[i].nowiReceivedQTY > 0) {
+		    				vue.$messagebox.alert("第"+index+"条数据的本次入库退库数量不能大于等于0！","错误");
 		    				return false;
-		    			}
+		    			}else if((genre == '0') && (data[i].nowiReceivedQTY < 0 || data[i].nowiReceivedQTY > (data[i].iQuantity - data[i].iReceivedQTY))) {
+							vue.$messagebox.alert("第"+index+"条数据的本次入库数量不能小于等于0或者不能大于入库上限！","错误");
+							return false;
+						}
 		    		}
 		    	}
 		    	return data;

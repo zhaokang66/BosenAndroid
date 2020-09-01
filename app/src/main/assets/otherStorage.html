@@ -1,6 +1,7 @@
 	<!DOCTYPE html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
 		<!-- 引入样式 -->
 		<link rel="stylesheet" type="text/css" href="./css/mint/style.min.css">
 		<link rel="stylesheet" href="./css/bootstrap/3.3.7/bootstrap.min.css">
@@ -66,10 +67,10 @@
 	}
 	</style>	
 	<div id="app" v-cloak>
-		<div class="nav">
-		<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
-		<div class="nav_title">友成出/入库扫描系统</div>
-	</div>
+		<div class="navBanner">
+			<div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
+			<div class="nav_title">友成出/入库扫描系统</div>
+		</div>
 		<div style="border:1px solid black;margin: 60px 0 0 10px;">
 			<select v-model="chooseWharehouse">
 				<option value="">选择仓库</option>
@@ -252,8 +253,6 @@
 	<script src="./js/vue/axios.min.js"></script>
 	<script src="./js/setting.js"></script>
 	<script>
-
-
 		function chevron_toggle(){
 			$("#collapseParent").find("span").toggleClass("glyphicon-chevron-up");
 			$("#collapseParent").find("span").toggleClass("glyphicon-chevron-down");
@@ -268,7 +267,7 @@
 				cMemo: '',
 				listRdStyle: [],
 				listdepartmen: [],
-				chooseCRdCode: '',
+				chooseCRdCode: '106',
 				inventoryArray: [],
 				listNumber: 10,
 				addNumber: 1,

@@ -1,314 +1,451 @@
 <!DOCTYPE html>
-
 <head>
-	<meta charset="UTF-8">
-	<!-- 引入样式 -->
-	<link rel="stylesheet" href="./css/mint/style.min.css">
-	<script type="text/javascript">
-		if (localStorage.getItem("messageInfo") != null) {
-			alert(localStorage.getItem("messageInfo"));
-			window.localStorage.clear();
-		}
-	</script>
-
+    <meta charset="UTF-8">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="./css/mint/style.min.css">
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+    <script type="text/javascript">
+        if (localStorage.getItem("messageInfo") != null) {
+            alert(localStorage.getItem("messageInfo"));
+            window.localStorage.removeItem('messageInfo')
+        }
+    </script>
 </head>
 <style>
-th{
-}
-table{
-	word-break:break-all; 
-	word-wrap:break-word;
-}
-.navButton {
-	width: 132px;
-	height: 40px;
-	border: 0;
-	border-radius: 11px;
-	background: #26a2ff;
-	color: white;
-	font-size: 14px;
-	outline: none;
-	margin: 4px 5px;
-}
-.replacePro{
-	width: 300px;
-	margin: 5px auto;
-	height: 40px;
-	display: block;
-	background-color: #26a2ff;
-	outline: none;
-	border-radius: 11px;
-	border: 0;
-	color: white;
-}
-.navButton:active {
-	opacity: 0.5;
-}
-.inStock{
-	width: 300px;
-	height: 201px;
-	margin: 5px auto;
-	text-align: center;
-	border: 1px solid grey;
-	border-radius: 8px;
-}
-.outStock{
-	width: 300px;
-	height: 152px;
-	margin: 5px auto;
-	text-align: center;
-	border: 1px solid grey;
-	border-radius: 8px;
-}
-.list{
-	width: 300px;
-	margin: 0 auto;
-}
+    th {
+    }
+    table {
+        word-break: break-all;
+        word-wrap: break-word;
+    }
+    .navButton {
+        width: 132px;
+        height: 40px;
+        border: 0;
+        border-radius: 11px;
+        background: #26a2ff;
+        color: white;
+        font-size: 14px;
+        outline: none;
+        margin: 4px 5px;
+    }
+    .replacePro {
+        width: 300px;
+        margin: 5px auto;
+        height: 40px;
+        display: block;
+        background-color: #26a2ff;
+        outline: none;
+        border-radius: 11px;
+        border: 0;
+        color: white;
+    }
+    .navButton:active {
+        opacity: 0.5;
+    }
+    .inStock {
+        width: 300px;
+        height: 201px;
+        margin: 5px auto;
+        text-align: center;
+        border: 1px solid grey;
+        border-radius: 8px;
+    }
+    .outStock {
+        width: 300px;
+        height: 260px;
+        margin: 5px auto;
+        text-align: center;
+        border: 1px solid grey;
+        border-radius: 8px;
+    }
+    .list {
+        width: 300px;
+        margin: 0 auto;
+    }
+    .task {
+        width: 280px;
+        height: 40px;
+        margin: 10px auto;
+        position: relative;
+    }
+    .task button {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        border-radius: 11px;
+        background: #26a2ff;
+        color: white;
+        font-size: 14px;
+        outline: none;
+    }
+    .task div {
+        position: absolute;
+        width: 30px;
+        height: 18px;
+        background-color: red;
+        border-radius: 10px;
+        top: -5px;
+        right: -5px;
+        color: white;
+        font-size: 9px;
+        text-align: center;
+    }
+    .popup {
+        width: 320px;
+        margin-top: 10px;
+        min-height: 520px;
+    }
+    .taskList {
+        border-bottom: 1px solid grey;
+        padding-right: 15px;
+    }
+    .taskList div {
+        position: absolute;
+        right: 5px;
+        top: 10px;
+        font-size: 26px;
+        cursor: pointer;
+        color: gainsboro;
+        width: 30px;
+        height: 30px;
+        text-align: center;
+    }
+    .taskList :hover {
+        color: blue;
+    }
+    .popup ul {
+        padding-left: 10px;
+        height: 434px;
+        overflow: scroll;
+    }
+    .popup ul li {
+        list-style: none;
+        margin: 5px auto;
+        width: 92%;
+        background-color: gainsboro;
+        font-size: 14px;
+        float: left;
+        padding: 10px;
+    }
+    .taskDate {
+        display: block;
+        float: right;
+    }
 </style>
 
 <body>
-	<div id="app" >
-		<div class="list">
-			<div style="width:300px;overflow:scroll" @scroll="topScrollEvent" ref="topDiv" id="topDiv">
-				<table width="1200" border="1" style="border-collapse:collapse">
-					<thead>
-						<tr>
-							<th style="width:100px">产品</th>
-							<th style="width:100px">付款日期</th>
-							<th style="width:100px">状态</th>
-							<th style="width:100px">产品</th>
-							<th style="width:100px">付款日期</th>
-							<th style="width:100px">状态</th>
-							<th style="width:100px">产品</th>
-							<th style="width:100px">付款日期</th>
-							<th style="width:100px">状态</th>
-							<th style="width:100px">产品</th>
-							<th style="width:100px">付款日期</th>
-							<th style="width:100px">状态</th></tr>
-						</thead>
-					</table>
-				</div>
+<div id="app">
+    <div class="navBanner">
+        <div class="back"><a href="JavaScript:history.back(-1)">返回</a></div>
+        <div class="nav_title">友成出/入库扫描系统</div>
+    </div>
+    <!--		<div class="list">-->
+    <!--			<div style="width:300px;overflow:scroll" @scroll="topScrollEvent" ref="topDiv" id="topDiv">-->
+    <!--				<table width="1200" border="1" style="border-collapse:collapse">-->
+    <!--					<thead>-->
+    <!--						<tr>-->
+    <!--							<th style="width:100px">产品</th>-->
+    <!--							<th style="width:100px">付款日期</th>-->
+    <!--							<th style="width:100px">状态</th>-->
+    <!--							<th style="width:100px">产品</th>-->
+    <!--							<th style="width:100px">付款日期</th>-->
+    <!--							<th style="width:100px">状态</th>-->
+    <!--							<th style="width:100px">产品</th>-->
+    <!--							<th style="width:100px">付款日期</th>-->
+    <!--							<th style="width:100px">状态</th>-->
+    <!--							<th style="width:100px">产品</th>-->
+    <!--							<th style="width:100px">付款日期</th>-->
+    <!--							<th style="width:100px">状态</th></tr>-->
+    <!--						</thead>-->
+    <!--					</table>-->
+    <!--				</div>-->
 
-				<div style="width:300px;height:300px;overflow:scroll"  ref="downDiv" @scroll="downScrollEvent" id="downDiv" >
+    <!--				<div style="width:300px;height:300px;overflow:scroll"  ref="downDiv" @scroll="downScrollEvent" id="downDiv" >-->
 
-					<table width="1200" border="1" style="border-collapse:collapse" v-infinite-scroll="loadMore"
-					infinite-scroll-disabled="loading"
-					infinite-scroll-distance="10">
-					<tbody>
-						<tr v-for="each in list">
-							<td style="width:100px">{{each.id}}</td>
-							<td style="width:100px">{{each.name}}</td>
-							<td style="width:100px">{{each.name2}}</td>
-							<td style="width:100px">{{each.name3}}</td>
-							<td style="width:100px">{{each.name4}}</td>
-							<td style="width:100px">{{each.name5}}</td>
-							<td style="width:100px">{{each.name6}}</td>
-							<td style="width:100px">{{each.name7}}</td>
-							<td style="width:100px">{{each.name8}}</td>
-							<td style="width:100px">{{each.name9}}</td>
-							<td style="width:100px">{{each.name10}}</td>
-							<td style="width:100px">{{each.name11}}</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
+    <!--					<table width="1200" border="1" style="border-collapse:collapse" v-infinite-scroll="loadMore"-->
+    <!--					infinite-scroll-disabled="loading"-->
+    <!--					infinite-scroll-distance="10">-->
+    <!--					<tbody>-->
+    <!--						<tr v-for="each in list">-->
+    <!--							<td style="width:100px">{{each.id}}</td>-->
+    <!--							<td style="width:100px">{{each.name}}</td>-->
+    <!--							<td style="width:100px">{{each.name2}}</td>-->
+    <!--							<td style="width:100px">{{each.name3}}</td>-->
+    <!--							<td style="width:100px">{{each.name4}}</td>-->
+    <!--							<td style="width:100px">{{each.name5}}</td>-->
+    <!--							<td style="width:100px">{{each.name6}}</td>-->
+    <!--							<td style="width:100px">{{each.name7}}</td>-->
+    <!--							<td style="width:100px">{{each.name8}}</td>-->
+    <!--							<td style="width:100px">{{each.name9}}</td>-->
+    <!--							<td style="width:100px">{{each.name10}}</td>-->
+    <!--							<td style="width:100px">{{each.name11}}</td>-->
+    <!--						</tr>-->
+    <!--					</tbody>-->
+    <!--				</table>-->
+    <!--			</div>-->
+    <!--		</div>-->
 
-		<div class="inStock">
-			<p>入库</p>
-			<button class="navButton" @click="jumpUrl('purchaseStorage')">采购入库</button>
-			<button class="navButton" @click="jumpUrl('purchaseStorageAndReturn')">采购入库退库</button>
-			<button class="navButton" @click="jumpUrl('productStorage')">产成品入库</button>
-			<button class="navButton" @click="jumpUrl('productStorageAndReturn')">产成品入库退库</button>
-			<button class="navButton" @click="jumpUrl('otherStorage')">其他入库</button>
-			<button class="navButton" @click="jumpUrl('otherStorageAndReturn')">其他入库退库</button>
-		</div>
+    <div class="inStock" style="margin-top: 60px;">
+        <p>入库</p>
+        <button class="navButton" @click="jumpUrl('purchaseStorage')">采购入库</button>
+        <button class="navButton" @click="jumpUrl('purchaseStorageAndReturn')">采购入库退库</button>
+        <button class="navButton" @click="jumpUrl('productStorage')">产成品入库</button>
+        <button class="navButton" @click="jumpUrl('productStorageAndReturn')">产成品入库退库</button>
+        <button class="navButton" @click="jumpUrl('otherStorage')">其他入库</button>
+        <button class="navButton" @click="jumpUrl('otherStorageAndReturn')">其他入库退库</button>
+    </div>
+    <div class="outStock">
+        <p>出库</p>
+                <button class="navButton" @click="jumpUrl('materialDelivery')">材料出库</button>
+                <button class="navButton" @click="jumpUrl('materialDeliveryAndReturn')">材料出库退库</button>
+        <button class="navButton" @click="jumpUrl('otherDelivery')">其他出库</button>
+        <button class="navButton" @click="jumpUrl('otherDeliveryAndReturn')">其他出库退库</button>
+        <button class="navButton" @click="jumpUrl('otherMaterialDelivery')">无订单领料</button>
+        <button class="navButton" @click="jumpUrl('otherMaterialDeliveryAndReturn')">无订单领料退库</button>
+        <div class="task">
+            <button @click="openOrCloseTaskList(true)">领料任务</button>
+            <div v-if="needOutNumber != 0">{{needOutNumber}}</div>
+        </div>
+    </div>
+    <mt-popup
+            class="popup "
+            v-model="popupVisible"
+            position="top"
+            popup-transition="popup-fade">
+        <div class="taskList">
+            <p>领料任务清单 </p>
+            <div @click="openOrCloseTaskList(false)">x</div>
+        </div>
+        <ul v-if="taskList.length != 0">
+            <li v-for="(val,index) in taskList" @click="jumpOrder(val)">
+                {{index + 1}}.
+                {{val.cdepname}}工组需要领取
+                生产编号为：{{val.productionCode}}的物料
+                <span class="taskDate">{{val.date.substring(0,16)}}</span></li>
+        </ul>
+        <span v-else>
+            您暂时没有领料任务！
+        </span>
+    </mt-popup>
+    <button class="replacePro" @click="jumpUrl('outboundList')">材料出库单据列表</button>
 
-		<div class="outStock">
-			<p>出库</p>
-			<button class="navButton" @click="jumpUrl('materialDelivery')">材料出库</button>
-			<button class="navButton" @click="jumpUrl('materialDeliveryAndReturn')">材料出库退库</button>	
-			<button class="navButton" @click="jumpUrl('otherDelivery')">其他出库</button>
-			<button class="navButton" @click="jumpUrl('otherDeliveryAndReturn')">其他出库退库</button>
+    <!--		<div id="signature" style="border:1px dotted black"></div>-->
+    <!--		<div style="border:1px solid black">-->
+    <!--			<button @click="reset">重置</button>-->
+    <!--			<button type="button" @click="add">提交</button>-->
 
-		</div>
+    <!--		</div>-->
 
+    <!--		<input name="test" type="text"   v-model.trim="test">-->
+    <!--		<input name="image" type="file" accept="image/*" @change="getFile($event)">-->
+    <!--		<button type="button" @click="add">提交</button>-->
+</div>
+<!--	<button>button</button>-->
 
+<!-- 先引入 Vue -->
+<script src="./js/vue/vue2.6.10.js"></script>
+<script src="./js/jquery/jquery3.4.1.js"></script>
+<!-- 引入组件库 -->
+<script src="./js/mint/index.js"></script>
+<script src="./js/jSignature/jSignature.min.js"></script>
+<script src="./js/vue/axios.min.js"></script>
+<script src="https://cdn.bootcss.com/qs/6.5.1/qs.min.js"></script>
+<script src="./js/setting.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#signature").jSignature()
+    })
+    var vue = new Vue({
+        el: "#app",
+        data: {
+            list: [],
+            test: 111,
+            file: null,
+            taskList: [],
+            popupVisible: false,
+            needOutNumber: 0,
+            websocket: null
+        },
+        methods: {
+            socketInit: function () {
+                if ('WebSocket' in window) {
+                    this.websocket = new WebSocket("ws://192.168.3.140:8084/ws/bitcoinServer")
+                    this.websocket.onopen = this.open
+                    this.websocket.onmessage = this.getMessage
+                    this.websocket.onerror = this.error
 
-		<button class="replacePro" @click="jumpUrl('outboundList')">材料出库单据列表</button>
-		<div id="signature" style="border:1px dotted black"></div>
-		<div style="border:1px solid black">
-			<button @click="reset">重置</button>
-			<button type="button" @click="add">提交</button>
+                } else {
+                    alert("不支持websocket")
+                }
+            },
+            open: function () {
+                this.websocket.send("与客户端成功连接")
+            },
+            getMessage: function (event) {//客户端接收服务端发送过来的数据
+                var data = JSON.parse(event.data)
+                var username = data.data.split(',')
+                console.log(username)
+                for (var i = 0; i < username.length; i++) {
+                    if (username[i] == JSON.parse(localStorage.getItem('userInfo')).username) {
+                        if (data.type == '1') {//1为自定义状态，表示为领料出库
+                            vue.needOutNumber++
+                            makeJava.makeNoticeSound();
+                            vue.$messagebox.alert('您有新的领料任务，请及时查看！', '提示')
+                            vue.popupVisible = false //关闭弹窗
+                            break
+                        } else {
+                            vue.needOutNumber--
+                        }
+                    }
+                }
+            },
+            error: function () {
+                alert("WebSocket网络连接发生错误,请检查网络后重启再试！");
+            },
+            close: function () {
+                alert("WebSocket连接关闭");
+            },
+            reset: function () {
+                $("#signature").jSignature("reset")
+            },
+            openOrCloseTaskList: function (val) {//打开任务清单
+                var userId = JSON.parse(localStorage.getItem('userInfo')).id
+                vue.taskList = []
+                if (val) {
+                    axios.get(getUrl() + 'user/getTask?userId=' + userId)
+                        .then(function (response) {
+                            var data = response.data
+                            if (data.length == 0) return
+                            console.log(data)
+                            var i = 0
+                            Object.keys(data).forEach(function (key) {
+                                vue.taskList[i] = {
+                                    'id': key,
+                                    'date': data[key][0].time,
+                                    'status': data[key][0].status,
+                                    'username': data[key][0].username,
+                                    'cdepname': data[key][0].cdepname,
+                                    'productionCode': data[key][0].productionCode,
+                                    'task': []
+                                }
+                                Object.keys(data[key]).forEach(function (item) {
+                                    vue.taskList[i].task = vue.taskList[i].task.concat(JSON.parse(data[key][item].task))
+                                })
+                                i++
 
-		</div>
+                            })
+                            vue.popupVisible = val
+                            console.log(vue.taskList)
+                        })
+                } else {
+                    vue.popupVisible = val
+                }
+            },
+            loadMore: function () {
+                vue.loading = true;
+                setTimeout(function () {
+                    var size = vue.list.length - 1;
+                    var last = vue.list[size].id;
 
-		<input name="test" type="text"   v-model.trim="test">
-		<input name="image" type="file" accept="image/*" @change="getFile($event)">
-		<button type="button" @click="add">提交</button>
-		
-	</div>
-	<button>button</button>
+                    if ("undefined" == typeof (last))
+                        last = 0;
+                    for (var i = 1; i <= 10; i++) {
+                        vue.list.push({
+                            "id": last + i,
+                            "name": "名字" + (last + i),
+                            "name2": "名字2" + (last + i),
+                            "name3": "名字3" + (last + i),
+                            "name4": "名字4" + (last + i),
+                            "name5": "名字5" + (last + i),
+                            "name6": "名字6" + (last + i),
+                            "name7": "名字7" + (last + i),
+                            "name8": "名字8" + (last + i),
+                            "name9": "名字9" + (last + i),
+                            "name10": "名字10" + (last + i),
+                            "name11": "名字11" + (last + i)
+                        });
+                    }
+                    vue.loading = false;
+                }, 1000);
+            },
+            topScrollEvent: function (e) {
+                this.$refs.downDiv.scrollLeft = this.$refs.topDiv.scrollLeft;
 
+            },
+            downScrollEvent: function (e) {
+                this.$refs.topDiv.scrollLeft = this.$refs.downDiv.scrollLeft;
+                this.$refs.topDiv.scrollTop = 0;
 
-	
+            },
+            jumpUrl: function (url) {
+                makeJava.jumpHtml("file:///android_asset/" + url + ".html");
+            },
+            getFile: function (event) {
+                this.file = event.target.files[0];
+                console.log(this.file);
+            },
+            add: function () {
 
+                var url = getUrl() + "addSignature/";
 
-
-	<script src="./js/jquery/jquery3.4.1.js" ></script>
-	<!-- 先引入 Vue -->
-	<script src="./js/vue/vue2.6.10.js"></script>
-	<!-- 引入组件库 -->
-	<script src="./js/mint/index.js"></script>
-	<script src="./js/jSignature/jSignature.min.js"></script>
-	<script src="./js/vue/axios.min.js"></script>	
-	<script src="https://cdn.bootcss.com/qs/6.5.1/qs.min.js"></script>
-	<script src="./js/setting.js"></script>
-	<script>
-		$(document).ready(function() {
-			$("#signature").jSignature()
-		})
-		
-		function test(){
-			alert("调用")
-		}
-
-
-/*
-document.getElementById("topDiv").addEventListener("scroll",handleScroll);
-document.getElementById("downDiv").addEventListener("scroll",handleScroll2);
-
-function handleScroll(e){
-	 //$("#downDiv").scrollLeft($(this).scrollLeft()); // 横向滚动条
-	 document.getElementById("downDiv").scrollLeft=this.scrollLeft
-}
-function handleScroll2(e){
-	 //$("#topDiv").scrollLeft($(this).scrollLeft()); // 横向滚动条
-	  document.getElementById("topDiv").scrollLeft=this.scrollLeft
-	}*/
-	$("button").click(function(){
-	//makeJava.showToast("okok");
-
-});
-
-/*
-var taskswiper = {
-      startX: 0,
-      startY: 0
-   };
-   var left=0;
-      var top=0;
-   $("#downDiv").on('touchstart', function(event){
-      if (event.originalEvent.targetTouches.length == 1) {
-         taskswiper.startX = event.originalEvent.targetTouches[0].pageX;
-         taskswiper.startY = event.originalEvent.targetTouches[0].pageY;
-		 
-		
-		
-      }
-
-   });
-
-   $("#downDiv").on('touchmove', function(event){
-      taskswiper.leftX = event.originalEvent.targetTouches[0].pageX - taskswiper.startX;
-      taskswiper.leftY = event.originalEvent.targetTouches[0].pageY - taskswiper.startY;
-
-      //横向移动大于纵向移动
-      if ((Math.abs(taskswiper.leftX) > Math.abs(taskswiper.leftY))) {
-	
-         //阻止纵向滚动事件
-         event.preventDefault();
-
-			$("#downDiv").scrollTop(top);
-      }else{
-
-			$("#downDiv").scrollLeft(left);
-	   
-	  }
-	});*/
-
-
-
-	window.vue=new Vue({
-		el: "#app",
-		data: {
-			
-			list:[],
-			test:111,
-			file:null
-			
-		},
-		methods: {
-			reset:function(){
-				$("#signature").jSignature("reset")
-			},
-			test1 : function() {
-				alert(444)
-			},
-			loadMore:function() {
-				
-				vue.loading = true;
-				
-				setTimeout(function(){
-					var size=vue.list.length - 1;
-					var last = vue.list[size].id;
-
-					if("undefined"==typeof(last))
-						last=0;
-					for (var i = 1; i <= 10; i++) {
-						vue.list.push({"id":last+i,"name":"名字"+(last+i),"name2":"名字2"+(last+i),"name3":"名字3"+(last+i),"name4":"名字4"+(last+i),"name5":"名字5"+(last+i),"name6":"名字6"+(last+i),"name7":"名字7"+(last+i),"name8":"名字8"+(last+i),"name9":"名字9"+(last+i),"name10":"名字10"+(last+i),"name11":"名字11"+(last+i)});
-					}
-					vue.loading = false;
-				}, 1000);
-			},
-			topScrollEvent:function(e){
-
-				this.$refs.downDiv.scrollLeft=this.$refs.topDiv.scrollLeft;
-				
-			},
-			downScrollEvent:function(e){
-				this.$refs.topDiv.scrollLeft=this.$refs.downDiv.scrollLeft;
-				this.$refs.topDiv.scrollTop=0;
-				
-			},
-			jumpUrl: function(url) {
-				makeJava.jumpHtml("file:///android_asset/"+url+".html");
-			},
-			getFile: function (event) {
-				
-				this.file = event.target.files[0];
-				console.log(this.file);
-			},
-			add: function () {
-				
-				var url = getUrl()+"addSignature/";
-				
-				var data = $("#signature").jSignature("getData", "svgbase64");
-				
-
-					//var testURl=Qs.stringify(test);
-					//alert(testURl)
-					console.log("data:"+data.join(","))
-					console.log(data[1])
-					axios.post(url,"base64Str="+encodeURIComponent(data[1])).then(function(response){                       
-						alert("成功")
-					}).catch(function(e){
-						console.log(e)
-					})   
-				},       
-				
-				
-
-			},
-			mounted:function(){
-				for(i=0;i<20;i++){
-					this.list.push({"id":i,"name":"名字"+i,"name2":"名字2"+i,"name3":"名字3"+i,"name4":"名字4"+i,"name5":"名字5"+i,"name6":"名字6"+i,"name7":"名字7"+i,"name8":"名字8"+i,"name9":"名字9"+i,"name10":"名字10"+i,"name11":"名字11"+i});
-				};
-				
+                var data = $("#signature").jSignature("getData", "svgbase64");
 
 
-			}
+                //var testURl=Qs.stringify(test);
+                //alert(testURl)
+                console.log("data:" + data.join(","))
+                console.log(data[1])
+                axios.post(url, "base64Str=" + encodeURIComponent(data[1])).then(function (response) {
+                    alert("成功")
+                }).catch(function (e) {
+                    console.log(e)
+                })
+            },
+            jumpOrder: function (val) {
+                if (typeof (Storage) !== "undefined") {
+                    localStorage.setItem("pp_PodetailsArray", JSON.stringify(val.task));
+                    localStorage.setItem("id", val.id);//领料任务id
+                    localStorage.setItem("poCMemo", "");
+                    localStorage.setItem("genre", "0");//领料类别（出库，出库退库）
+                    makeJava.jumpHtml("file:///android_asset/materialOutStockByOrder.html");
+                } else {
+                    alert("Sorry, your browser does not support Web Storage...")
+                }
+            },
+        },
+        destroyed: function () {
+            this.websocket.onclose = this.close
+        },
+        mounted: function () {
+            this.socketInit()
+            var userId = JSON.parse(localStorage.getItem('userInfo')).id
+            axios.get(getUrl() + 'user/getCountTask?userId=' + userId)
+                .then(function (response) {
+                    vue.needOutNumber = response.data
+                })
+                .catch(function (e) {
+                    vue.$messagebox.alert(e, '错误')
+                })
+            // for (i = 0; i < 20; i++) {
+            //     this.list.push({
+            //         "id": i,
+            //         "name": "名字" + i,
+            //         "name2": "名字2" + i,
+            //         "name3": "名字3" + i,
+            //         "name4": "名字4" + i,
+            //         "name5": "名字5" + i,
+            //         "name6": "名字6" + i,
+            //         "name7": "名字7" + i,
+            //         "name8": "名字8" + i,
+            //         "name9": "名字9" + i,
+            //         "name10": "名字10" + i,
+            //         "name11": "名字11" + i
+            //     });
+            // }
 
-		})
-	</script>
+
+        }
+    })
+</script>
 </body>
