@@ -56,6 +56,7 @@
 	table.downTable2{
         width: 1100px;
         border-collapse:collapse;
+<<<<<<< HEAD
     }
 	table.topTable3{
 		width:700px;
@@ -65,10 +66,14 @@
 		width: 700px;
 		border-collapse:collapse;
 	}
+=======
+    }   
+>>>>>>> 6b0d7518b6c62986b8709bfb026cc63df9086357
 	input.condition{
 		width:100px;
 		height:20px;
 	}
+<<<<<<< HEAD
 	.fatherTab{
 		display: block;
 	}
@@ -83,6 +88,8 @@
 		outline: none;
 		-webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 	}
+=======
+>>>>>>> 6b0d7518b6c62986b8709bfb026cc63df9086357
 </style>
 
 <body>
@@ -289,8 +296,13 @@ axios.defaults.timeout = 10000;
 				this.pp_ProductPOArray = [];
             	this.pp_PomainArray = [];
             	this.pp_PodetailsArray = [];
+<<<<<<< HEAD
 				this.filterData = []
 				var url = getUrl()+"listPP_ProductPO?bFinished=true&endId=-1&detailsFinshed=false&productionCode="+this.productionCode + '&cWhCode=' + this.cWhCode;
+=======
+
+				var url = getUrl()+"listPP_ProductPO?bFinished=true&endId=-1&detailsFinshed=false&cDepName="+this.cDepName+"&productionCode="+this.productionCode;
+>>>>>>> 6b0d7518b6c62986b8709bfb026cc63df9086357
 				this.doLoadMore(url)
 			},
             //加载更多
@@ -369,10 +381,17 @@ axios.defaults.timeout = 10000;
 				}else{
 					for(var i=0;i<this.pp_PomainArray.length;i++){
 						if(this.pp_PomainArray[i].id==ID){
+<<<<<<< HEAD
 							for(var j=0; j < this.pp_PodetailsArray.length;j++) {
 								if (this.pp_PodetailsArray[j].mainId == this.pp_PomainArray[i].mainId) {
 									this.pp_PodetailsArray.splice(j,1)
 									j--
+=======
+							for (var j = 0; j < this.pp_PodetailsArray.length; j++) {
+								if (this.pp_PodetailsArray[j].mainId == this.pp_PomainArray[i].mainId) {
+									this.pp_PodetailsArray.splice(j,1);
+									j--;
+>>>>>>> 6b0d7518b6c62986b8709bfb026cc63df9086357
 								}
 							}
 							this.pp_PomainArray.splice(i,1);
@@ -382,6 +401,7 @@ axios.defaults.timeout = 10000;
 					vue.filterData = vue.pp_PodetailsArray.slice();
 				}
 			},
+<<<<<<< HEAD
 			updatenumberOfOutbound: function() {
 				if (vue.numberOfOutbound > vue.pp_PomainArray[vue.index].fQuantity) {
 					vue.numberOfOutbound = vue.pp_PomainArray[vue.index].fQuantity
@@ -420,6 +440,18 @@ axios.defaults.timeout = 10000;
 								jsonObject[each].needOutNumber = jsonObject[each].fQuantity - jsonObject[each].fOutQuantity
 							}else {
 								jsonObject[each].needOutNumber = numberOfOutbound * (jsonObject[each].ipsquantity / jsonObject[each].tdQtyD)
+=======
+			jumpOderInstock:function(){
+				window.localStorage.clear();
+		    	this.poCMemo = (this.pp_ProductPOArray.length == 1) ? this.poCMemo=this.pp_ProductPOArray[0].cMemo : '';
+		    	var submitData = this.pp_PodetailsArray.slice();
+				for (i in this.pp_PomainArray) {
+					if (!this.pp_PomainArray[i].checked) {
+						for (var j = 0; j < submitData.length; j++) {
+							if (submitData[j].mainId == this.pp_PomainArray[i].mainId) {
+								submitData.splice(j,1);
+								j--;
+>>>>>>> 6b0d7518b6c62986b8709bfb026cc63df9086357
 							}
 						}
 						vue.pp_PodetailsArray = vue.pp_PodetailsArray.concat(jsonObject);
@@ -453,6 +485,7 @@ axios.defaults.timeout = 10000;
 					$("#chooseChild").addClass("active");
 					$("#chooseFather").removeClass("active");
 				}
+<<<<<<< HEAD
 			},
 			//根据组别过滤子件，
 			filterPPDetails: function() {
@@ -479,6 +512,8 @@ axios.defaults.timeout = 10000;
 						submitData.push(this.filterData[i]);
 					}
 				}
+=======
+>>>>>>> 6b0d7518b6c62986b8709bfb026cc63df9086357
 				console.log(submitData)
 				if (submitData.length == 0) {
 					vue.$messagebox.alert("请选择所属子项！", '错误');
@@ -487,8 +522,12 @@ axios.defaults.timeout = 10000;
 				if (typeof(Storage) !== "undefined") {
 					localStorage.setItem("pp_PodetailsArray",JSON.stringify(submitData));
 					localStorage.setItem("poCMemo",JSON.stringify(this.poCMemo));
+<<<<<<< HEAD
 					localStorage.setItem("genre","0");
 					makeJava.jumpHtml("file:///android_asset/materialOutStockByOrder.html");
+=======
+					makeJava.jumpHtml("file:///android_asset/materialOutStockByOrder.html");				
+>>>>>>> 6b0d7518b6c62986b8709bfb026cc63df9086357
 				} else {
     				alert("Sorry, your browser does not support Web Storage...")
 				}
@@ -525,6 +564,11 @@ axios.defaults.timeout = 10000;
 					$('#department').attr("disabled",false);
 				}
 			}
+<<<<<<< HEAD
 		}
+=======
+        },
+
+>>>>>>> 6b0d7518b6c62986b8709bfb026cc63df9086357
     })
 </script>

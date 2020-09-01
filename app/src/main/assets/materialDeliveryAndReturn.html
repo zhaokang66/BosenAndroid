@@ -92,12 +92,17 @@
 		<div class="nav_title">友成出/入库扫描系统</div>
 	</div>
 	<div style="margin-top: 60px;">
+<<<<<<< HEAD
 		生产部门:
 		<select @change="selectPP_ProductPO" v-model="cDepName" style="width: 75px;">
 			<option ></option>
 			<option v-for="list in listdepartmen" :value="list.cDepName">{{list.cDepCode}} {{list.cDepName}}</option>
 		</select>
 		<input type="text" placeholder="请输入生产编号" class="condition" v-model="productionCode" />
+=======
+		<input type="text" placeholder="请输入部门" class="condition" v-model="cDepName"/>
+		<input type="text" placeholder="请输入生产编号" class="condition" v-model="productionCode"/>
+>>>>>>> 6b0d7518b6c62986b8709bfb026cc63df9086357
 		<mt-button size="small" type="primary" @click.native="selectPP_ProductPO" :disabled="isDisable">查询</mt-button>
 	</div>
 	<div style="border:1px solid black">
@@ -196,6 +201,7 @@
 				</table>
 			</div>
 		</div>
+<<<<<<< HEAD
 
 		<div class="childTab" id="childTab">
 			<label style="font-size: 12px">用料车间：</label>
@@ -237,6 +243,9 @@
 			</div>
 		</div>
 	</div>
+=======
+	</div>	
+>>>>>>> 6b0d7518b6c62986b8709bfb026cc63df9086357
 	<mt-button size="small" type="primary" @click="jumpOderInstock" style="float:right">确定</mt-button>
 	<mt-button size="small" type="primary" style="float:right">取消</mt-button>
 </div>
@@ -275,6 +284,7 @@
 		methods:{
 			selectPP_ProductPO:function(){
 				var that = this;
+<<<<<<< HEAD
 				this.isDisable = true;
 				setTimeout(function() {
 					that.isDisable = false;
@@ -286,6 +296,21 @@
 				this.filterData = []
 
 				var url = getUrl()+"listPP_ProductPO?bFinished=true&endId=-1&detailsFinshed=true&productionCode="+this.productionCode + "&cDepName=" + this.cDepName;
+=======
+		    	this.isDisable = true;
+		    	setTimeout(function() {
+		    		that.isDisable = false;
+		    	},1000);
+
+		    	//初始化数组
+				this.pp_ProductPOArray = [];
+            	this.pp_PomainArray = [];
+            	this.pp_PodetailsArray = [];
+
+				var url = getUrl()+"listPP_ProductPO?bFinished=true&endId=-1&detailsFinshed=true&cDepName="+this.cDepName+"&productionCode="+this.productionCode;
+				this.pp_ProductPOArray=[]
+				this.pp_PomainArray=[]
+>>>>>>> 6b0d7518b6c62986b8709bfb026cc63df9086357
 				this.doLoadMore(url)
 			},
 			//加载更多
@@ -366,10 +391,17 @@
 				}else{
 					for(var i=0;i<this.pp_PomainArray.length;i++){
 						if(this.pp_PomainArray[i].id==ID){
+<<<<<<< HEAD
 							for(var j=0; j < this.pp_PodetailsArray.length;j++) {
 								if (this.pp_PodetailsArray[j].mainId == this.pp_PomainArray[i].mainId) {
 									this.pp_PodetailsArray.splice(j,1)
 									j--
+=======
+							for (var j = 0; j < this.pp_PodetailsArray.length; j++) {
+								if (this.pp_PodetailsArray[j].mainId == this.pp_PomainArray[i].mainId) {
+									this.pp_PodetailsArray.splice(j,1);
+									j--;
+>>>>>>> 6b0d7518b6c62986b8709bfb026cc63df9086357
 								}
 							}
 							this.pp_PomainArray.splice(i,1);
@@ -380,6 +412,7 @@
 
 				}
 			},
+<<<<<<< HEAD
 			updatenumberOfOutbound: function() {
 				if (vue.numberOfOutbound > vue.pp_PomainArray[vue.index].fQuantity) {
 					vue.numberOfOutbound = vue.pp_PomainArray[vue.index].fQuantity
@@ -415,6 +448,18 @@
 								jsonObject[each].needOutNumber = jsonObject[each].fQuantity - jsonObject[each].fOutQuantity
 							}else {
 								jsonObject[each].needOutNumber = numberOfOutbound * (jsonObject[each].ipsquantity / jsonObject[each].tdQtyD)
+=======
+			jumpOderInstock:function(){
+				window.localStorage.clear();
+		    	this.poCMemo = (this.pp_ProductPOArray.length == 1) ? this.poCMemo=this.pp_ProductPOArray[0].cMemo : '';
+		    	var submitData = this.pp_PodetailsArray.slice();
+				for (i in this.pp_PomainArray) {
+					if (!this.pp_PomainArray[i].checked) {
+						for (var j = 0; j < submitData.length; j++) {
+							if (submitData[j].mainId == this.pp_PomainArray[i].mainId) {
+								submitData.splice(j,1);
+								j--;
+>>>>>>> 6b0d7518b6c62986b8709bfb026cc63df9086357
 							}
 						}
 						vue.pp_PodetailsArray = vue.pp_PodetailsArray.concat(jsonObject);
@@ -433,6 +478,7 @@
 					}
 					vue.filterData = vue.pp_PodetailsArray.slice();
 				}
+<<<<<<< HEAD
 			},
 			showHideTab: function(e) {
 				var target = e.target;
@@ -474,6 +520,8 @@
 						submitData.push(this.filterData[i]);
 					}
 				}
+=======
+>>>>>>> 6b0d7518b6c62986b8709bfb026cc63df9086357
 				console.log(submitData)
 				if (submitData.length == 0) {
 					vue.$messagebox.alert("请选择所属子项！", '错误');
@@ -482,8 +530,12 @@
 				if (typeof(Storage) !== "undefined") {
 					localStorage.setItem("pp_PodetailsArray",JSON.stringify(submitData));
 					localStorage.setItem("poCMemo",JSON.stringify(this.poCMemo));
+<<<<<<< HEAD
 					localStorage.setItem("genre","1");
 					makeJava.jumpHtml("file:///android_asset/materialOutStockByOrder.html");
+=======
+					makeJava.jumpHtml("file:///android_asset/materialOutStockByOrder.html");				
+>>>>>>> 6b0d7518b6c62986b8709bfb026cc63df9086357
 				} else {
 					alert("Sorry, your browser does not support Web Storage...")
 				}
@@ -514,6 +566,13 @@
 					$('#department').attr("disabled",false);
 				}
 			}
+<<<<<<< HEAD
 		}
 	})
+=======
+        },
+    })
+
+
+>>>>>>> 6b0d7518b6c62986b8709bfb026cc63df9086357
 </script>
